@@ -9,5 +9,5 @@ uniform sampler2D specularMap;
 
 void main()
 {
-	color = texture(image1, UV);
+    color = texture(image1, UV);
 }

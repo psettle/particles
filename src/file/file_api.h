@@ -7,13 +7,13 @@
 #define FILE_API_H
 
 /**********************************************************************
-							GENERAL INCLUDES
+                            GENERAL INCLUDES
 **********************************************************************/
 
 #include "common_types.h"
 
 /**********************************************************************
-								TYPES
+                                TYPES
 **********************************************************************/
 
 /* Describes the contents of a file */
@@ -24,20 +24,20 @@ typedef struct file_contents_struct
 } file_contents_type;
 
 /**********************************************************************
-							  PROTOTYPES
+                              PROTOTYPES
 **********************************************************************/
 
 /**
  * @brief Checks if a file exists using a full file path
  *
  * @return
- *		TRUE if the file exists
- *		FALSE if the file does not exist
+ *        TRUE if the file exists
+ *        FALSE if the file does not exist
  */
 boolean file_exists
-	(
-		sint8_t const * filename
-	);
+    (
+        sint8_t const * filename
+    );
 
 /**
  * @brief Open a file and return the contents
@@ -45,8 +45,8 @@ boolean file_exists
  * @note file_contents must be cleared with @see file_free
  *
  * @return
- *		TRUE on success
- *		FALSE on failure
+ *        TRUE on success
+ *        FALSE on failure
  */
 boolean file_read
     (

@@ -15,9 +15,9 @@ uniform mat4 model;
 
 void main()
 {
-	gl_Position = MVP * vec4(position.x, position.y, position.z, 1.0f);
-	UV = dataUV;
-	colorOut = colorData;
-	normals = vec3(mat3(transpose(inverse(model))) * normalData);
-	fragPos = vec3(model * vec4(position, 1.0f));
+    gl_Position = MVP * vec4(position.x, position.y, position.z, 1.0f);
+    UV = dataUV;
+    colorOut = colorData;
+    normals = vec3(mat3(transpose(inverse(model))) * normalData);
+    fragPos = vec3(model * vec4(position, 1.0f));
 }
