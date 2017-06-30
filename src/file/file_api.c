@@ -60,7 +60,7 @@ boolean file_read
         return FALSE;
     }
 
-    while(TRUE)
+    while( TRUE )
     {
         read_count = fread( read_buffer, 1, sizeof( read_buffer ), fp );
         if( 0 == read_count )

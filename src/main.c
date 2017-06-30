@@ -7,12 +7,23 @@
 */
 
 #include    "stdio.h"
-#include    "opengl_includes.h"
+#include    "matrix_math.h"
 
 int main()
 {
+    vec3_type vec3;
+    mat4_type mat4;
+
     GLFWwindow*         pWindow;
     GLubyte const *     version;
+
+
+    vec3_set( &vec3, VEC3_NULL );
+    mat4_set( &mat4, MAT4_NULL );
+
+    while(1);
+
+    return 0;
 
 	if (!glfwInit()) {
 		return GLFW_FALSE;
