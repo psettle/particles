@@ -185,14 +185,14 @@ static void frame
     if ( ( glfwGetKey( system_instance.glfw_window, GLFW_KEY_ESCAPE ) == GLFW_PRESS ) ||
          ( glfwWindowShouldClose( system_instance.glfw_window ) != 0 ) )
     {
-		system_instance.should_close_window = TRUE;
-		return;
-	}
+        system_instance.should_close_window = TRUE;
+        return;
+    }
 
     /* Clear the last frame */
     glfwPollEvents();
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
     /* Send the frame events out */
     memset( &event_data, 0, sizeof( frame_event_type ) );
@@ -204,6 +204,6 @@ static void frame
         cb( &event_data );
     }
 
-	/* Swap the buffer (finishing the frame) */
-	glfwSwapBuffers( system_instance.glfw_window );
+    /* Swap the buffer (finishing the frame) */
+    glfwSwapBuffers( system_instance.glfw_window );
 }
