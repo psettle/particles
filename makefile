@@ -13,6 +13,8 @@ INCLUDE += src/file
 INCLUDE += src/general
 INCLUDE += src/shader
 INCLUDE += src/math
+INCLUDE += src/core
+INCLUDE += src/vector
 
 #source includes
 SOURCES += src/main.c
@@ -22,6 +24,10 @@ SOURCES += src/file/file_api.c
 SOURCES += src/shader/shader.c
 
 SOURCES += src/math/matrix_math.c
+
+SOURCES += src/vector/vector.c
+
+SOURCES += src/core/system.c
 
 #lib includes
 LIBS += lib/libglew32.a
