@@ -9,6 +9,7 @@
 **********************************************************************/
 
 #include "system.h"
+#include "object_group_core.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -88,12 +89,32 @@ boolean system_init
         void
     )
 {
+    vec3_type vertex;
+    vector_type* vertices;
+
     memset( &system_instance, 0, sizeof( system_type ) );
 
     system_instance.system_event_listeners    = vector_init( sizeof( system_event_callback ) );
     system_instance.frame_event_listeners     = vector_init( sizeof( frame_event_callback ) );
 
-    return openGL_system_init();
+    object_group_init();
+
+    vertices = vector_init( sizeof( vec3_type ) );
+
+    vec3_set( &vertex, 0.0, 0.5, 0.0 );
+    vector_push_back( vertices, &vertex );
+
+    vec3_set( &vertex, 0.5, -0.5, 0.0 );
+    vector_push_back( vertices, &vertex );
+
+    vec3_set( &vertex, -0.5, -0.5, 0.0 );
+    vector_push_back( vertices, &vertex );
+
+    openGL_system_init();
+
+    object_group_create("shaders/vertex.glsl", "shaders/fragment.glsl", vertices );
+
+    return TRUE;
 }
 
 void system_run
@@ -118,14 +139,14 @@ static boolean openGL_system_init
         void
     )
 {
-        if( !glfwInit() )
+    if( !glfwInit() )
     {
         return FALSE;
     }
 
     glfwWindowHint( GLFW_SAMPLES, 16 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 0 );
     glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
     glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
@@ -142,6 +163,13 @@ static boolean openGL_system_init
     {
         return FALSE;
     }
+
+    glViewport( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT );
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glfwSwapInterval( 0 );
 
     return TRUE;
 }
@@ -166,9 +194,13 @@ static void system_deinit
         cb( &event_data );
     }
 
+    object_group_deinit();
+
     /* Free the system memory */
     vector_deinit( system_instance.system_event_listeners );
     vector_deinit( system_instance.frame_event_listeners );
+
+    glfwTerminate();
 }
 
 static void frame
@@ -192,7 +224,7 @@ static void frame
     /* Clear the last frame */
     glfwPollEvents();
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
     /* Send the frame events out */
     memset( &event_data, 0, sizeof( frame_event_type ) );

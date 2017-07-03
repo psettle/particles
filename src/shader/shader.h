@@ -56,6 +56,14 @@ void shader_use
     );
 
 /**
+ * @brief Clear the active shader
+ */
+void shader_clear
+    (
+        void
+    );
+
+/**
  * @brief Clear the resources associated with a shader
  */
 void shader_free

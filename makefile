@@ -28,6 +28,7 @@ SOURCES += src/math/matrix_math.c
 SOURCES += src/vector/vector.c
 
 SOURCES += src/core/system.c
+SOURCES += src/core/object_group_core.c
 
 #lib includes
 LIBS += lib/libglew32.a

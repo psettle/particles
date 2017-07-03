@@ -117,6 +117,15 @@ void shader_use
     glUseProgram( p_shader->program_id );
 }
 
+
+void shader_clear
+    (
+        void
+    )
+{
+    glUseProgram( 0 );
+}
+
 void shader_free
     (
         shader_type     * p_shader

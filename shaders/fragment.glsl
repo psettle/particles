@@ -1,13 +1,8 @@
-#version 330 core
+#version 400
 
-in vec3 colorOut;
-in vec2 UV;
 out vec4 color;
-
-uniform sampler2D image1;
-uniform sampler2D specularMap;
 
 void main()
 {
-    color = texture(image1, UV);
+    color = vec4( 0.1, 0.8, 0.2, 1.0 );
 }

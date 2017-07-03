@@ -12,7 +12,9 @@
 
 #include "common_types.h"
 #include "opengl_includes.h"
+#include "shader.h"
 #include "vector.h"
+#include "matrix_math.h"
 
 /**********************************************************************
                               CAMERA TYPES
@@ -22,6 +24,20 @@ typedef struct camera_struct
 {
     uint8_t placeholder;
 } camera_type;
+
+/**********************************************************************
+                          OBJECT GROUP TYPES
+**********************************************************************/
+
+/* Represents a group of objects that use the same vertexes, shaders and textures */
+typedef struct object_group_struct
+{
+    GLuint            vertex_array_object;
+    camera_type     * camera;
+    shader_type       shader;
+    vector_type     * positions; /* Array of vec3_type representing the position of each object in the group */
+    uint32_t          vertex_count;
+} object_group_type;
 
 /**********************************************************************
                            FRAME EVENT TYPES
@@ -67,8 +83,8 @@ typedef void ( * system_event_callback )
 /* Argument a listener can use to register with the system, NULL callbacks will be ignored */
 typedef struct system_listener_callbacks_struct
 {
-    system_event_callback system_event_cb;
-    frame_event_callback frame_event_cb;
+    system_event_callback   system_event_cb;
+    frame_event_callback    frame_event_cb;
 } system_listener_callbacks_type;
 
 /* System controller data */

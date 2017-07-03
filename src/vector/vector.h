@@ -50,7 +50,7 @@ void vector_deinit
  */
 uint32_t vector_size
     (
-        vector_type     * vector
+        vector_type const * vector
     );
 
 /**
@@ -93,6 +93,7 @@ void vector_pop_back
  * @brief Accessed an element from the vector
  *
  * @return A pointer to the internal memory that holds the element
+ * (Any vector function may reallocate this memory, so the pointer should be fetched every use)
  */
 void * vector_access
     (

@@ -78,7 +78,7 @@ void vector_deinit
 
 uint32_t vector_size
     (
-        vector_type     * vector
+        vector_type const * vector
     )
 {
     return vector->item_count;
