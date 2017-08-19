@@ -72,6 +72,16 @@ void vector_push_front
     );
 
 /**
+ * @brief Append several items onto a vector
+ */
+void vector_push_back_many
+    (
+        vector_type     * vector,
+        void      const * items,
+        uint32_t          count
+    );
+
+/**
  * @brief Pops an element off the front of a vector
  */
 void vector_pop_front
@@ -97,8 +107,25 @@ void vector_pop_back
  */
 void * vector_access
     (
+        vector_type const * vector,
+        uint32_t            index
+    );
+
+/**
+ * @brief Clears the vector
+ */
+void vector_empty
+    (
+        vector_type     * vector
+    );
+
+/*
+ * @brief Removes all elements that equal target from the vector
+ */
+void vector_remove
+    (
         vector_type     * vector,
-        uint32_t          index
+        void      const * target
     );
 
 #endif /* VECTOR_H */

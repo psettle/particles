@@ -40,7 +40,7 @@ typedef GLenum shader_type_t; enum
  */
 static boolean shader_compile
     (
-        sint8_t const * shader_filename,
+        sint8_t const * shader_code,
         shader_type_t   shader_type,
         GLuint        * shader_handle   /* [out] Handle to the shader */
     );
@@ -83,8 +83,8 @@ static void print_program_error_log
 boolean shader_build
     (
         shader_type     * p_shader,
-        sint8_t const   * vertex_shader_filename,
-        sint8_t const   * fragment_shader_filename
+        sint8_t const   * vertex_shader_code,
+        sint8_t const   * fragment_shader_code
     )
 {
     GLuint      vertex_shader_handle;
@@ -92,12 +92,12 @@ boolean shader_build
     boolean     status;
 
     /* Compile vertex shader */
-    status = shader_compile( vertex_shader_filename, SHADER_TYPE_VERTEX, &vertex_shader_handle );
+    status = shader_compile( vertex_shader_code, SHADER_TYPE_VERTEX, &vertex_shader_handle );
 
     CHECK_STATUS( status );
 
     /* Compile fragment shader */
-    status = shader_compile( fragment_shader_filename, SHADER_TYPE_FRAGMENT, &fragment_shader_handle );
+    status = shader_compile( fragment_shader_code, SHADER_TYPE_FRAGMENT, &fragment_shader_handle );
 
     CHECK_STATUS( status );
 
@@ -134,39 +134,51 @@ void shader_free
     glDeleteProgram( p_shader->program_id );
 }
 
+void shader_set_uniform_mat4
+    (
+        shader_type const * p_shader,
+        sint8_t     const * uniform_name,
+        mat4_type   const * mat4
+    )
+{
+    GLuint uniform_location;
+
+    uniform_location = glGetUniformLocation( p_shader->program_id, uniform_name );
+    glUniformMatrix4fv( uniform_location, 1, GL_FALSE, &mat4->x.x );
+}
+
+void shader_set_uniform_uint32
+    (
+        shader_type const * p_shader,
+        sint8_t     const * uniform_name,
+        uint32_t            uint32
+    )
+{
+    GLuint uniform_location;
+
+    uniform_location = glGetUniformLocation( p_shader->program_id, uniform_name );
+    glUniform1i( uniform_location, uint32 );
+}
+
 static boolean shader_compile
     (
-        sint8_t const * shader_filename,
+        sint8_t const * shader_code,
         shader_type_t   shader_type,
         GLuint        * shader_handle /* [out] Handle to the shader */
     )
 {
-    file_contents_type          file_contents;
-    boolean                     status;
     GLchar const * const *      gl_file_contents;
-    GLint *                     gl_file_length;
     GLint                       compile_status;
-
-    /* Read the shader contents */
-    status = file_read( shader_filename, &file_contents );
-
-    CHECK_STATUS( status );
 
     /* Prepare shader arguments */
     *shader_handle      = glCreateShader( shader_type );
-    gl_file_contents    = ( GLchar const * const * )&file_contents.p_file_contents;
-    gl_file_length      = ( GLint * )&file_contents.length;
+    gl_file_contents    = ( GLchar const * const * )&shader_code;
 
     /* Attach the source of the shader */
-    glShaderSource( *shader_handle, 1, gl_file_contents, gl_file_length );
+    glShaderSource( *shader_handle, 1, gl_file_contents, NULL );
 
     /* Compile the shader */
     glCompileShader( *shader_handle );
-
-    /* Clear the shader contents resource */
-    status = file_free( &file_contents );
-
-    CHECK_STATUS( status );
 
     /* Check the result of the compile */
     glGetShaderiv( *shader_handle, GL_COMPILE_STATUS, &compile_status );

@@ -11,6 +11,7 @@
 **********************************************************************/
 
 #include "common_types.h"
+#include "vector.h"
 
 /**********************************************************************
                                 TYPES
@@ -51,19 +52,20 @@ boolean file_exists
 boolean file_read
     (
         sint8_t         const *    filename,
-        file_contents_type    *    p_file_contents /* [out] */
+        vector_type           *    contents /* [out] sint8_t */
     );
 
 /**
- * @brief Clear the resources associated with a read file @see file_read
+ * @brief Writes contents to a file
  *
  * @return
- *      TRUE on success
- *      FALSE on failure
+ *        TRUE on success
+ *        FALSE on failure
  */
-boolean file_free
+boolean file_write
     (
-        file_contents_type const * p_file_contents /* [in] */
+        sint8_t         const *     filename,
+        vector_type     const *     contents /* [in] sint8_t */
     );
 
 #endif /* FILE_API_H */

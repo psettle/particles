@@ -12,6 +12,7 @@
 
 #include "common_types.h"
 #include "opengl_includes.h"
+#include "matrix_math.h"
 
 /**********************************************************************
                             LITERAL CONSTANTS
@@ -43,8 +44,8 @@ typedef struct shader_struct
 boolean shader_build
     (
         shader_type     * p_shader,
-        sint8_t const   * vertex_shader_filename,
-        sint8_t const   * fragment_shader_filename
+        sint8_t const   * vertex_shader_code,
+        sint8_t const   * fragment_shader_code
     );
 
 /**
@@ -69,6 +70,26 @@ void shader_clear
 void shader_free
     (
         shader_type     * p_shader
+    );
+
+/**
+ * @brief Set the value of an mat4 uniform
+ */
+void shader_set_uniform_mat4
+    (
+        shader_type const * p_shader,
+        sint8_t     const * uniform_name,
+        mat4_type   const * mat4
+    );
+
+/**
+ * @brief Set the value of an int uniform
+ */
+void shader_set_uniform_uint32
+    (
+        shader_type const * p_shader,
+        sint8_t     const * uniform_name,
+        uint32_t            uint32
     );
 
 #endif /* SHADER_H */

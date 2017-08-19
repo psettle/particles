@@ -115,6 +115,24 @@ void vector_push_front
     memcpy( new_item_slot, item, vector->item_size );
 }
 
+void vector_push_back_many
+    (
+        vector_type     * vector,
+        void      const * items,
+        uint32_t          count
+    )
+{
+    uint8_t     * items_local;
+    uint32_t      i;
+
+    items_local = (uint8_t *)items;
+
+    for( i = 0; i < count; ++i )
+    {
+        vector_push_back( vector, items_local + vector->item_size * i );
+    }
+}
+
 void vector_pop_front
     (
         vector_type     * vector,
@@ -153,8 +171,8 @@ void vector_pop_back
 
 void * vector_access
     (
-        vector_type     * vector,
-        uint32_t          index
+        vector_type const * vector,
+        uint32_t            index
     )
 {
     return (void *)&vector->list_items[index * vector->item_size];
@@ -239,4 +257,38 @@ static void shift_items
 
     free( vector->list_items );
     vector->list_items = new_list_items;
+}
+
+void vector_empty
+    (
+        vector_type     * vector
+    )
+{
+    vector->item_count = 0;
+    resize( vector, VECTOR_DEFAULT_SIZE );
+}
+
+void vector_remove
+    (
+        vector_type     * vector,
+        void      const * target
+    )
+{
+    uint32_t len;
+    uint32_t i;
+
+    len = vector_size( vector );
+    for( i = 0; i < len; ++i )
+    {
+        uint8_t * item;
+
+        item = (uint8_t *)vector_access( vector, i );
+
+        if( 0 == memcmp( item, target, vector->item_size ) )
+        {
+            len -= 1;
+            vector->item_count -= 1;
+            memcpy( item, item + vector->item_size, vector->item_size * ( len - i ) );
+        }
+    }
 }

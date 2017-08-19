@@ -40,6 +40,11 @@ static void pop_front_test
         void
     );
 
+static void remove_test
+    (
+        void
+    );
+
 /**********************************************************************
                             FUNCTIONS
 **********************************************************************/
@@ -53,6 +58,7 @@ void vector_tests_run
     push_front_test();
     pop_front_test();
     pop_back_test();
+    remove_test();
 }
 
 static void push_back_test
@@ -73,6 +79,7 @@ static void push_back_test
     }
 
     print_vector( vector );
+    vector_deinit( vector );
 }
 
 static void push_front_test
@@ -93,6 +100,7 @@ static void push_front_test
     }
 
     print_vector( vector );
+    vector_deinit( vector );
 }
 
 static void pop_back_test
@@ -120,6 +128,7 @@ static void pop_back_test
     }
 
     print_vector( vector );
+    vector_deinit( vector );
 }
 
 static void pop_front_test
@@ -147,6 +156,38 @@ static void pop_front_test
     }
 
     print_vector( vector );
+    vector_deinit( vector );
+}
+
+static void remove_test
+    (
+        void
+    )
+{
+    vector_type   * vector;
+    uint32_t        i;
+    uint32_t        item;
+
+    printf( "Remove test start:\n" );
+
+    vector = vector_init( sizeof( uint32_t ) );
+
+    for( i = 0; i < 20; ++i )
+    {
+        vector_push_back( vector, &i );
+    }
+
+    print_vector( vector );
+
+    for( i = 19; i <= 19; i -= 2 )
+    {
+        item = i;
+        vector_remove( vector, &item );
+    }
+
+    print_vector( vector );
+
+    vector_deinit( vector );
 }
 
 static void print_vector( vector_type* vector )

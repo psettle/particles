@@ -26,6 +26,14 @@ void register_system_listeners
     );
 
 /**
+ * @brief Sets the active camera for the system
+ */
+void system_set_camera
+    (
+        camera_type const * camera
+    );
+
+/**
  * @brief Initialize openGL and the system
  *
  * @return TRUE on success, FALSE on failure

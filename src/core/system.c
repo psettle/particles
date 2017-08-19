@@ -10,16 +10,24 @@
 
 #include "system.h"
 #include "object_group_core.h"
+#include "object.h"
+#include "camera.h"
 #include <stdlib.h>
 #include <string.h>
 
 /**********************************************************************
                            LITERAL CONSTANTS
 **********************************************************************/
+#define FULLSCREEN      FALSE
 
+#if FULLSCREEN
+#define WINDOW_WIDTH    1920
+#define WINDOW_HEIGHT   1080
+#else
 #define WINDOW_WIDTH    600
 #define WINDOW_HEIGHT   600
-#define FULLSCREEN      FALSE
+#endif
+
 #define WINDOW_NAME     "Particles"
 
 /**********************************************************************
@@ -50,12 +58,21 @@ static void frame
         void
     );
 
+/**
+ * @brief Sends a system event
+ */
+static void send_system_event
+    (
+        system_event_type const * event_data
+    );
+
 /**********************************************************************
                              VARIABLES
 **********************************************************************/
 
 /* The singleton system instance */
 static system_type system_instance;
+static camera_type system_camera_instance;
 
 /**********************************************************************
                              FUNCIONS
@@ -84,13 +101,64 @@ void register_system_listeners
     }
 }
 
+void system_set_camera
+    (
+        camera_type const * camera
+    )
+{
+    system_event_type event_data;
+
+    system_instance.system_camera = ( camera_type * )camera;
+    /* Send the new camera event */
+    memset( &event_data, 0, sizeof( system_event_type ) );
+    event_data.event_type = SYSTEM_EVENT_NEW_CAMERA;
+    event_data.event_data.new_camera_data = ( camera_type * )camera;
+
+    send_system_event( &event_data );
+}
+
+    GLfloat vertices_raw[] = {
+         0.5f, 0.5f, 0.5f,
+         0.5f, -0.5f, 0.5f,
+        -0.5f, -0.5f, 0.5f,
+        -0.5f, 0.5f, 0.5f,
+         0.5f, 0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, 0.5f, -0.5f,
+    };
+
+    GLfloat uvs_raw[] = {
+        1.0f,  0.0f,
+        1.0f,  1.0f,
+        0.0f,  1.0f,
+        0.0f,  0.0f,
+        1.0f,  0.0f,
+        1.0f,  1.0f,
+        0.0f,  1.0f,
+        0.0f,  0.0f,
+    };
+
+    GLuint triangles_raw[] = {
+        0, 1, 3,
+        1, 2, 3,
+        4, 5, 7,
+        5, 6, 7,
+    };
+
 boolean system_init
     (
         void
     )
 {
-    vec3_type vertex;
     vector_type* vertices;
+    vector_type* triangles;
+    vector_type* uvs;
+    vec3_type from;
+    vec3_type to;
+    vec3_type up;
+    object_group_type* object_group;
+    object_type* object;
 
     memset( &system_instance, 0, sizeof( system_type ) );
 
@@ -100,19 +168,40 @@ boolean system_init
     object_group_init();
 
     vertices = vector_init( sizeof( vec3_type ) );
-
-    vec3_set( &vertex, 0.0, 0.5, 0.0 );
-    vector_push_back( vertices, &vertex );
-
-    vec3_set( &vertex, 0.5, -0.5, 0.0 );
-    vector_push_back( vertices, &vertex );
-
-    vec3_set( &vertex, -0.5, -0.5, 0.0 );
-    vector_push_back( vertices, &vertex );
+    vector_push_back_many( vertices, vertices_raw, 8 );
+    triangles = vector_init( sizeof( vertex_triangle_type ) );
+    vector_push_back_many( triangles, triangles_raw, 4 );
+    uvs = vector_init( sizeof( uv_type ) );
+    vector_push_back_many( uvs, uvs_raw, 8 );
 
     openGL_system_init();
 
-    object_group_create("shaders/vertex.glsl", "shaders/fragment.glsl", vertices );
+    object_group = object_group_create("images/test.jpg", vertices, triangles, uvs );
+
+    vec3_set( &from, 1.0f, 0.0f, 1.0f );
+    vec3_set( &to, 0.0f, 0.0f, 0.0f );
+    vec3_set( &up, 0.0f, 1.0f, 0.0f );
+    camera_init( &system_camera_instance );
+    camera_set_view
+        (
+            &system_camera_instance,
+            &from,
+            &to,
+            &up
+        );
+
+    camera_set_perspective
+        (
+            &system_camera_instance,
+            DEFAULT_FOV,
+            1920,
+            1080,
+            DEFAULT_FRONT,
+            DEFAULT_BACK
+        );
+
+    object = object_create( object_group );
+    object_set_visibility( object, TRUE );
 
     return TRUE;
 }
@@ -179,20 +268,13 @@ static void system_deinit
         void
     )
 {
-    uint32_t                len;
-    uint32_t                i;
-    system_event_callback   cb;
     system_event_type       event_data;
 
     /* Send the deinit events */
     memset( &event_data, 0, sizeof( system_event_type ) );
     event_data.event_type = SYSTEM_EVENT_DEINIT_START;
-    len = vector_size( system_instance.system_event_listeners );
-    for( i = 0; i < len; ++i )
-    {
-        cb = *( system_event_callback * )vector_access( system_instance.system_event_listeners, i );
-        cb( &event_data );
-    }
+
+    send_system_event( &event_data );
 
     object_group_deinit();
 
@@ -238,4 +320,21 @@ static void frame
 
     /* Swap the buffer (finishing the frame) */
     glfwSwapBuffers( system_instance.glfw_window );
+}
+
+static void send_system_event
+    (
+        system_event_type const * event_data
+    )
+{
+    uint32_t                len;
+    uint32_t                i;
+    system_event_callback   cb;
+
+    len = vector_size( system_instance.system_event_listeners );
+    for( i = 0; i < len; ++i )
+    {
+        cb = *( system_event_callback * )vector_access( system_instance.system_event_listeners, i );
+        cb( event_data );
+    }
 }

@@ -17,4 +17,6 @@
 
 #include "glfw3.h"
 
+#include "SOIL.h"
+
 #endif /* OPENGL_INCLUDES_H */

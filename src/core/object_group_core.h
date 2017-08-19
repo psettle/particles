@@ -17,6 +17,27 @@
 **********************************************************************/
 
 /**
+ * @brief Set the value of a vertex triangle
+ */
+void uv_set
+    (
+        uv_type   * uv,
+        GLfloat     u,
+        GLfloat     v
+    );
+
+/**
+ * @brief Set the value of a vertex triangle
+ */
+void vertex_triangle_set
+    (
+        vertex_triangle_type    * vertex_triangle,
+        uint32_t                  a,
+        uint32_t                  b,
+        uint32_t                  c
+    );
+
+/**
  * @brief Initialize the object group system
  */
 void object_group_init
@@ -29,9 +50,7 @@ void object_group_init
  */
 object_group_type * object_group_create
     (
-        sint8_t     const * vertex_shader_filename,
-        sint8_t     const * fragment_shader_filename,
-        vector_type       * vertices /* Array of vec3_type representing the position of each vertex  */
+        object_group_create_argument_type const * params
     );
 
 /**
@@ -76,4 +95,4 @@ void system_run
         void
     );
 
-#endif /* SYSTEM_H */
+#endif /* OBJECT_CORE_H */

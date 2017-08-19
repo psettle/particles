@@ -37,21 +37,17 @@ boolean file_exists
 boolean file_read
     (
         sint8_t         const *    filename,
-        file_contents_type    *    p_file_contents
+        vector_type           *    contents /* [out] sint8_t */
     )
 {
     FILE*       fp;
     uint8_t     read_buffer[READ_BUFFER_SIZE];
-    uint8_t*    temp_buffer;
     uint32_t    read_count;
     boolean     status;
 
     /* If the file doesn't exist, return false */
     status = file_exists( filename );
     CHECK_STATUS( status );
-
-    /* Clear the return struct */
-    memset( p_file_contents, 0, sizeof(file_contents_type) );
 
     fp = fopen( filename, "r" );
 
@@ -60,39 +56,43 @@ boolean file_read
         return FALSE;
     }
 
+    vector_empty( contents );
+
     while( TRUE )
     {
         read_count = fread( read_buffer, 1, sizeof( read_buffer ), fp );
+        vector_push_back_many( contents, read_buffer, read_count );
+
         if( 0 == read_count )
         {
             break;
         }
-
-        temp_buffer = malloc( p_file_contents->length + read_count );
-        memcpy( temp_buffer, p_file_contents->p_file_contents, p_file_contents->length );
-        memcpy( temp_buffer + p_file_contents->length, read_buffer, read_count);
-
-        if( NULL != p_file_contents->p_file_contents )
-        {
-            free( p_file_contents->p_file_contents );
-        }
-
-        p_file_contents->p_file_contents = temp_buffer;
-        p_file_contents->length += read_count;
     }
+
+    vector_push_back( contents, "\0" );
 
     fclose( fp );
     return TRUE;
 } /* file_read */
 
-boolean file_free
+boolean file_write
     (
-        file_contents_type const * p_file_contents
+        sint8_t         const *     filename,
+        vector_type     const *     contents /* [in] sint8_t */
     )
 {
-    if( ( p_file_contents->length > 0 ) && ( NULL != p_file_contents->p_file_contents ) )
+    FILE*       fp;
+
+    fp = fopen( filename, "w" );
+
+    if( NULL == fp )
     {
-        free( p_file_contents->p_file_contents );
+        return FALSE;
     }
+
+    fprintf( fp, "%s", vector_access( contents, 0 ) );
+
+    fclose( fp );
+
     return TRUE;
-} /* file_free */
+}
