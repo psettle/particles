@@ -12,6 +12,7 @@
 #include "object.h"
 #include "texture.h"
 #include "camera.h"
+#include "common_util.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -56,8 +57,10 @@ static sint8_t fragment_shader_3d_uv_no_light[] = {
 **********************************************************************/
 /**
  * @brief Perform openGL specific init
+ *
+ * @return TRUE on success, FALSE on failure.
  */
-static void openGL_init
+static boolean openGL_init
     (
         object_group_type * object_group,
         object_group_create_argument_type const * params
@@ -65,8 +68,10 @@ static void openGL_init
 
 /**
  * @brief Selects an appropriate shader for the paremeters, builds and assigns it
+ *
+ * @return TRUE on success, false on failure.
  */
-static void select_shader
+static boolean select_shader
     (
         object_group_type * object_group,
         object_group_create_argument_type const * params
@@ -149,9 +154,10 @@ void object_group_init
     register_system_listeners( &callbacks );
 }
 
-object_group_type * object_group_create
+ object_group_type * object_group_create
     (
-        object_group_create_argument_type const * params
+        object_group_create_argument_type const * params,
+        boolean * status
     )
 {
     object_group_type * object_group;
@@ -168,12 +174,13 @@ object_group_type * object_group_create
     vector_push_back( active_object_groups.active_object_groups, &object_group );
 
     /* Build the shader to use */
-    select_shader( object_group );
+    *status = select_shader( object_group, params );
+    CHECK_STATUS( *status );
 
     /* Build texture if required */
     if( params->use_uvs )
     {
-        texture_init
+        *status = texture_init
         (
             &object_group->texture,
             params->texture_filename,
@@ -181,14 +188,16 @@ object_group_type * object_group_create
             &object_group->shader,
             TEXTURE_UNIFORM_NAME
         );
+        CHECK_STATUS( *status );
     }
 
     /* Do openGL specific init */
-    openGL_init
+    *status = openGL_init
         (
             object_group,
             params
         );
+    CHECK_STATUS( *status );
 
     return object_group;
 }
@@ -227,7 +236,7 @@ void object_group_deinit
     vector_deinit( active_object_groups.active_object_groups );
 }
 
-static void openGL_init
+static boolean openGL_init
     (
         object_group_type * object_group,
         object_group_create_argument_type const * params
@@ -237,6 +246,7 @@ static void openGL_init
     GLuint              element_buffer_object;
     GLuint              uv_buffer_object;
     GLuint              normal_buffer_object;
+    GLuint              bone_buffer_object;
 
     /* Assign the vertexes to the object group */
     glGenVertexArrays( 1, &object_group->vertex_array_object );
@@ -244,6 +254,7 @@ static void openGL_init
     glGenBuffers( 1, &element_buffer_object );
     glGenBuffers( 1, &uv_buffer_object );
     glGenBuffers( 1, &normal_buffer_object );
+    glGenBuffers( 1, &bone_buffer_object );
 
     glBindVertexArray( object_group->vertex_array_object );
 
@@ -282,9 +293,11 @@ static void openGL_init
 
     glBindVertexArray( 0 );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+    return TRUE;
 }
 
-static void select_shader
+static boolean select_shader
     (
         object_group_type * object_group,
         object_group_create_argument_type const * params
@@ -294,7 +307,10 @@ static void select_shader
         ( params->use_uvs ) &&
         ( !params->is_lighted ) )
     {
+        return shader_build( &object_group->shader, vertex_shader_3d_uv_no_light, fragment_shader_3d_uv_no_light );
     }
+
+    return FALSE;
 }
 
 static void object_group_global_frame_cb
@@ -363,7 +379,7 @@ static void object_group_frame_cb
         if( object->is_visible )
         {
             shader_set_uniform_mat4( &object_group->shader, "model_matrix", &object->model_matrix );
-            glDrawElements(GL_TRIANGLES, object_group->vertex_count, GL_UNSIGNED_INT, 0);
+            glDrawElements( GL_TRIANGLES, object_group->vertex_count, GL_UNSIGNED_INT, 0 );
         }
     }
 

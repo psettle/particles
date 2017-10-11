@@ -47,10 +47,18 @@ void object_group_init
 
 /**
  * @brief Create a new object group
+ *
+ * @param params
+ *      Information about the object group to create.
+ *
+ * @param[out] Status of creating the object group
+ *
+ * @return A pointer to the object group container.
  */
-object_group_type * object_group_create
+ object_group_type * object_group_create
     (
-        object_group_create_argument_type const * params
+        object_group_create_argument_type const * params,
+        boolean * status
     );
 
 /**

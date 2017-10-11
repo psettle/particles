@@ -7,14 +7,27 @@
 #define COMMON_UTIL_H
 
 /**********************************************************************
+                            GENERAL INCLUDES
+**********************************************************************/
+
+#include "stdio.h"
+
+/**********************************************************************
                                 MACROS
 **********************************************************************/
+
+#define CHECK_STATUS_DEBUG      TRUE
 
 #define CHECK_STATUS( status )\
 do\
 {\
-    if( !status )\
+    if( !( status ) )\
     {\
+        if( CHECK_STATUS_DEBUG )\
+        {\
+        const char* err = "Fail on line " " of file "  " \n";\
+        printf( "%s", err );\
+        }\
         return FALSE;\
     }\
 }\

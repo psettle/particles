@@ -12,6 +12,7 @@
 #include "object_group_core.h"
 #include "object.h"
 #include "camera.h"
+#include "common_util.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -151,14 +152,13 @@ boolean system_init
         void
     )
 {
-    vector_type* vertices;
-    vector_type* triangles;
-    vector_type* uvs;
     vec3_type from;
     vec3_type to;
     vec3_type up;
     object_group_type* object_group;
     object_type* object;
+    object_group_create_argument_type params;
+    boolean status;
 
     memset( &system_instance, 0, sizeof( system_type ) );
 
@@ -166,17 +166,19 @@ boolean system_init
     system_instance.frame_event_listeners     = vector_init( sizeof( frame_event_callback ) );
 
     object_group_init();
-
-    vertices = vector_init( sizeof( vec3_type ) );
-    vector_push_back_many( vertices, vertices_raw, 8 );
-    triangles = vector_init( sizeof( vertex_triangle_type ) );
-    vector_push_back_many( triangles, triangles_raw, 4 );
-    uvs = vector_init( sizeof( uv_type ) );
-    vector_push_back_many( uvs, uvs_raw, 8 );
-
     openGL_system_init();
 
-    object_group = object_group_create("images/test.jpg", vertices, triangles, uvs );
+    memset( &params, 0, sizeof( params ) );
+    params.texture_filename = "images/test.jpg";
+    params.vertices = (vec3_type*)vertices_raw;
+    params.vertex_count = sizeof( vertices_raw ) / sizeof ( vec3_type );
+    params.triangles = (vertex_triangle_type*)triangles_raw;
+    params.triangle_count = sizeof( triangles_raw ) / sizeof( vertex_triangle_type );
+    params.uvs = (uv_type*)uvs_raw;
+    params.use_uvs = TRUE;
+
+    object_group = object_group_create( &params, &status );
+    CHECK_STATUS( status );
 
     vec3_set( &from, 1.0f, 0.0f, 1.0f );
     vec3_set( &to, 0.0f, 0.0f, 0.0f );
@@ -200,10 +202,12 @@ boolean system_init
             DEFAULT_BACK
         );
 
-    object = object_create( object_group );
+    object = object_create( object_group, &status );
+    CHECK_STATUS( status );
+
     object_set_visibility( object, TRUE );
 
-    return TRUE;
+    return status;
 }
 
 void system_run

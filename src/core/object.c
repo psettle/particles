@@ -9,6 +9,7 @@
 **********************************************************************/
 
 #include "object.h"
+#include "stdlib.h"
 
 /**********************************************************************
                             LITERAL CONSTANTS
@@ -32,7 +33,8 @@
 
 object_type * object_create
     (
-        object_group_type * object_group
+        object_group_type * object_group,
+        boolean * status
     )
 {
     object_type * object;
@@ -45,6 +47,7 @@ object_type * object_create
 
     vector_push_back( object_group->objects, &object );
 
+    *status = TRUE;
     return object;
 }
 
