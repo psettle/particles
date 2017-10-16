@@ -149,6 +149,7 @@ void object_group_init
 
 	object_group->is_3d = !params->is_2d;
 	object_group->use_uvs = params->use_uvs;
+	object_group->vertex_count = params->vertex_count;
 
     /* Init the array of object positions */
     object_group->objects = vector_init( sizeof( object_type* ) );
