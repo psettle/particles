@@ -50,39 +50,39 @@ typedef struct vertex_triangle_struct
 
 typedef struct bone_struct
 {
-	uint16_t  bone_id;
-	mat4_type bone_transform_matrix;
+    uint16_t  bone_id;
+    mat4_type bone_transform_matrix;
 } bone_type;
 
 typedef struct object_struct
 {
-	uint16_t      object_id;
-	boolean       is_visible;
-	vec3_type     position;
-	mat4_type     model_matrix;
-	vector_type * bones; /* Vector of bone_type, for each bone in the object */
+    uint16_t      object_id;
+    boolean       is_visible;
+    vec3_type     position;
+    mat4_type     model_matrix;
+    vector_type * bones; /* Vector of bone_type, for each bone in the object */
 } object_type;
 
 typedef void(*object_frame_cb_type)
-	(
-	object_type * object
-	);
+    (
+    object_type * object
+    );
 
 /* Represents a group of objects that use the same vertexes, shaders and textures */
 typedef struct object_group_struct
 {
-	uint32_t          next_id;
-	GLuint            vertex_array_object;
-	camera_type     * camera;
-	shader_type       shader;
-	texture_type      texture;
-	vector_type     * objects; /* Array of object_type* representing each unique object in the group */
-	uint32_t          vertex_count;
-	uint32_t          triangle_count;
-	vector_type     * buffers_to_delete; /* GLuint Random buffers that must be deleted when the object goes out of scope */
-	boolean			  is_3d;
-	boolean			  use_uvs;
-	object_frame_cb_type object_frame_cb;
+    uint32_t          next_id;
+    GLuint            vertex_array_object;
+    camera_type     * camera;
+    shader_type       shader;
+    texture_type      texture;
+    vector_type     * objects; /* Array of object_type* representing each unique object in the group */
+    uint32_t          vertex_count;
+    uint32_t          triangle_count;
+    vector_type     * buffers_to_delete; /* GLuint Random buffers that must be deleted when the object goes out of scope */
+    boolean              is_3d;
+    boolean              use_uvs;
+    object_frame_cb_type object_frame_cb;
 } object_group_type;
 
 typedef struct object_group_create_argument_struct
@@ -106,7 +106,7 @@ typedef struct object_group_create_argument_struct
     vertex_triangle_type const * triangles;
     vector_type                * default_bones;
     uint32_t                     texture_slot;
-	object_frame_cb_type         object_frame_cb;
+    object_frame_cb_type         object_frame_cb;
 } object_group_create_argument_type;
 
 

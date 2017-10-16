@@ -29,34 +29,34 @@ boolean texture_init
     uint8_t   * image;
 
     texture->slot = slot;
-	texture->shader = shader;
-	texture->uniform_name = uniform_name;
+    texture->shader = shader;
+    texture->uniform_name = uniform_name;
 
-	/* use soil to load the image data */
-	image = SOIL_load_image( image_filename, &width, &height, 0, SOIL_LOAD_RGBA);
+    /* use soil to load the image data */
+    image = SOIL_load_image( image_filename, &width, &height, 0, SOIL_LOAD_RGBA);
     if( !image )
     {
         DEBUG_LINE();
         return FALSE;
     }
 
-	/* generate and bind a texture */
-	glGenTextures( 1, &texture->texture_id );
-	glBindTexture(GL_TEXTURE_2D, texture->texture_id );
+    /* generate and bind a texture */
+    glGenTextures( 1, &texture->texture_id );
+    glBindTexture(GL_TEXTURE_2D, texture->texture_id );
 
-	/* tell open gl how to scale and alias the texture */
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    /* tell open gl how to scale and alias the texture */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	/* bind the image data to the texture */
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-	/* generate a MIPMAP for the texture */
-	glGenerateMipmap(GL_TEXTURE_2D);
+    /* bind the image data to the texture */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    /* generate a MIPMAP for the texture */
+    glGenerateMipmap(GL_TEXTURE_2D);
 
-	/* safely delete the image data */
-	SOIL_free_image_data(image);
+    /* safely delete the image data */
+    SOIL_free_image_data(image);
 
-	/* clear the bound texture */
+    /* clear the bound texture */
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return TRUE;
@@ -68,8 +68,8 @@ void texture_use
     )
 {
     glActiveTexture( texture->slot );
-	glBindTexture( GL_TEXTURE_2D,  texture->texture_id );
-	shader_set_uniform_uint32( texture->shader, texture->uniform_name, texture->slot - GL_TEXTURE0 );
+    glBindTexture( GL_TEXTURE_2D,  texture->texture_id );
+    shader_set_uniform_uint32( texture->shader, texture->uniform_name, texture->slot - GL_TEXTURE0 );
 }
 
 void texture_clear

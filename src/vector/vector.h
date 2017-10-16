@@ -33,10 +33,10 @@ typedef struct vector_struct
  * @brief Access a pointer to an element of a vector
  *
  * @param type
- *			The type of elements stored in the vector
+ *            The type of elements stored in the vector
  *
  * @return
- *			An element of type type*
+ *            An element of type type*
  */
 #define vector_access( vector, index, type ) ( ( type* )vector_access_untyped( vector, index ) )
 

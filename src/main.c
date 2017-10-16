@@ -13,7 +13,7 @@ int main()
 {
     if ( system_init() )
     {
-		texture_cube_start();
+        texture_cube_start();
         system_run();
     }
 

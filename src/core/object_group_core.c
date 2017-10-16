@@ -43,7 +43,7 @@ typedef struct active_object_group_struct
 **********************************************************************/
 
 static active_object_group_type active_object_groups;
-static camera_type*				active_camera;
+static camera_type*                active_camera;
 
 /**********************************************************************
                              PROTOTYPES
@@ -148,12 +148,12 @@ void object_group_init
 
     object_group = calloc( 1, sizeof( object_group_type ) );
 
-	object_group->is_3d					= !params->is_2d;
-	object_group->use_uvs				= params->use_uvs;
-	object_group->vertex_count			= params->vertex_count;
-	object_group->triangle_count		= params->triangle_count;
-	object_group->object_frame_cb		= params->object_frame_cb;
-	object_group->camera				= active_camera;
+    object_group->is_3d                    = !params->is_2d;
+    object_group->use_uvs                = params->use_uvs;
+    object_group->vertex_count            = params->vertex_count;
+    object_group->triangle_count        = params->triangle_count;
+    object_group->object_frame_cb        = params->object_frame_cb;
+    object_group->camera                = active_camera;
 
     /* Init the array of object positions */
     object_group->objects = vector_init( sizeof( object_type* ) );
@@ -238,7 +238,7 @@ void object_group_delete
     }
 
     /* Free system resources */
-	vector_remove( active_object_groups.active_object_groups, &object_group );
+    vector_remove( active_object_groups.active_object_groups, &object_group );
     vector_deinit( object_group->objects );
     vector_deinit( object_group->buffers_to_delete );
     texture_free( &object_group->texture );
@@ -251,10 +251,10 @@ void object_group_deinit
         void
     )
 {
-	while( vector_size( active_object_groups.active_object_groups ) > 0 )
-	{
-		object_group_delete( *vector_access(active_object_groups.active_object_groups, 0, object_group_type* ) );
-	}
+    while( vector_size( active_object_groups.active_object_groups ) > 0 )
+    {
+        object_group_delete( *vector_access(active_object_groups.active_object_groups, 0, object_group_type* ) );
+    }
 
     vector_deinit( active_object_groups.active_object_groups );
 }
@@ -278,11 +278,11 @@ static boolean openGL_init
     glGenBuffers( 1, &uv_buffer_object );
     glGenBuffers( 1, &normal_buffer_object );
     glGenBuffers( 1, &bone_buffer_object );
-	vector_push_back( object_group->buffers_to_delete, &vertex_buffer_object );
-	vector_push_back( object_group->buffers_to_delete, &element_buffer_object );
-	vector_push_back( object_group->buffers_to_delete, &uv_buffer_object );
-	vector_push_back( object_group->buffers_to_delete, &normal_buffer_object );
-	vector_push_back( object_group->buffers_to_delete, &bone_buffer_object );
+    vector_push_back( object_group->buffers_to_delete, &vertex_buffer_object );
+    vector_push_back( object_group->buffers_to_delete, &element_buffer_object );
+    vector_push_back( object_group->buffers_to_delete, &uv_buffer_object );
+    vector_push_back( object_group->buffers_to_delete, &normal_buffer_object );
+    vector_push_back( object_group->buffers_to_delete, &bone_buffer_object );
 
     glBindVertexArray( object_group->vertex_array_object );
 
@@ -298,24 +298,24 @@ static boolean openGL_init
     if( params->use_uvs )
     {
         glBindBuffer( GL_ARRAY_BUFFER, uv_buffer_object );
-	    glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( uv_type ), params->uvs, GL_STATIC_DRAW );
-	    glVertexAttribPointer( UV_ATTRIB_POINTER, 2, GL_FLOAT, GL_FALSE, 0, NULL );
+        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( uv_type ), params->uvs, GL_STATIC_DRAW );
+        glVertexAttribPointer( UV_ATTRIB_POINTER, 2, GL_FLOAT, GL_FALSE, 0, NULL );
         glEnableVertexAttribArray( UV_ATTRIB_POINTER );
     }
 
     if( params->use_normals )
     {
         glBindBuffer( GL_ARRAY_BUFFER, normal_buffer_object );
-	    glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( vec3_type ), params->normals, GL_STATIC_DRAW );
-	    glVertexAttribPointer( NORMAL_ATTRIB_POINTER, 3, GL_FLOAT, GL_FALSE, 0, NULL );
+        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( vec3_type ), params->normals, GL_STATIC_DRAW );
+        glVertexAttribPointer( NORMAL_ATTRIB_POINTER, 3, GL_FLOAT, GL_FALSE, 0, NULL );
         glEnableVertexAttribArray( NORMAL_ATTRIB_POINTER );
     }
 
     if( params->bone_association_size > 0 )
     {
         glBindBuffer( GL_ARRAY_BUFFER, bone_buffer_object );
-	    glBufferData( GL_ARRAY_BUFFER, params->vertex_count * params->bone_association_size * sizeof( GLfloat ), vector_access( params->bone_associations, 0, uint8_t ), GL_STATIC_DRAW );
-	    glVertexAttribPointer( BONE_ATTRIB_POINTER, params->bone_association_size, GL_FLOAT, GL_FALSE, 0, NULL );
+        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * params->bone_association_size * sizeof( GLfloat ), vector_access( params->bone_associations, 0, uint8_t ), GL_STATIC_DRAW );
+        glVertexAttribPointer( BONE_ATTRIB_POINTER, params->bone_association_size, GL_FLOAT, GL_FALSE, 0, NULL );
         glEnableVertexAttribArray( BONE_ATTRIB_POINTER );
     }
 
@@ -337,7 +337,7 @@ static void object_group_global_frame_cb
     object_group_type   * object_group;
 
     len = vector_size( active_object_groups.active_object_groups );
-	
+    
     for( i = 0; i < len; ++i )
     {
         object_group = *vector_access( active_object_groups.active_object_groups, i, object_group_type* );
@@ -355,10 +355,10 @@ static void object_group_global_system_cb
     uint32_t              len;
     object_group_type   * object_group;
 
-	if( SYSTEM_EVENT_NEW_CAMERA == event_data->event_type )
-	{
-		active_camera = event_data->event_data.new_camera_data;
-	}
+    if( SYSTEM_EVENT_NEW_CAMERA == event_data->event_type )
+    {
+        active_camera = event_data->event_data.new_camera_data;
+    }
 
     len = vector_size( active_object_groups.active_object_groups );
 
@@ -377,16 +377,16 @@ static void object_group_frame_cb
 {
     uint16_t i;
     uint16_t len;
-	
+    
     shader_use( &object_group->shader );
 
-	if ( object_group->use_uvs )
-	{
-		texture_use(&object_group->texture);
-	}
+    if ( object_group->use_uvs )
+    {
+        texture_use(&object_group->texture);
+    }
     
     camera_set_active( object_group->camera, &object_group->shader );
-	
+    
     len = vector_size( object_group->objects );
 
     glBindVertexArray( object_group->vertex_array_object );
@@ -396,19 +396,19 @@ static void object_group_frame_cb
 
         object = *vector_access( object_group->objects, i, object_type* );
 
-		if( object_group->object_frame_cb )
-		{
-			object_group->object_frame_cb( object );
-		}
+        if( object_group->object_frame_cb )
+        {
+            object_group->object_frame_cb( object );
+        }
 
         if( object->is_visible )
         {
-			if(object_group->is_3d )
-			{
-				shader_set_uniform_mat4( &object_group->shader, "model_matrix", &object->model_matrix );
-			}
-			
-			glDrawElements( GL_TRIANGLES, object_group->triangle_count * sizeof( vertex_triangle_type ) / sizeof( GLuint ), GL_UNSIGNED_INT, 0 );
+            if(object_group->is_3d )
+            {
+                shader_set_uniform_mat4( &object_group->shader, "model_matrix", &object->model_matrix );
+            }
+            
+            glDrawElements( GL_TRIANGLES, object_group->triangle_count * sizeof( vertex_triangle_type ) / sizeof( GLuint ), GL_UNSIGNED_INT, 0 );
         }
     }
 
