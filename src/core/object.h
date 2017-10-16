@@ -18,8 +18,7 @@
 
 object_type * object_create
     (
-        object_group_type * object_group,
-        boolean * status
+        object_group_type * object_group
     );
 
 void object_set_visibility

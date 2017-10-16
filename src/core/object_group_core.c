@@ -13,6 +13,7 @@
 #include "texture.h"
 #include "camera.h"
 #include "common_util.h"
+#include "file_api.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -43,15 +44,6 @@ typedef struct active_object_group_struct
 
 static active_object_group_type active_object_groups;
 
-static sint8_t vertex_shader_3d_uv_no_light[] = {
-#include"vertex_shader_3d_uv_no_light.glsl"
-};
-
-static sint8_t fragment_shader_3d_uv_no_light[] = {
-#include"fragment_shader_3d_uv_no_light.glsl"
-};
-
-
 /**********************************************************************
                              PROTOTYPES
 **********************************************************************/
@@ -61,17 +53,6 @@ static sint8_t fragment_shader_3d_uv_no_light[] = {
  * @return TRUE on success, FALSE on failure.
  */
 static boolean openGL_init
-    (
-        object_group_type * object_group,
-        object_group_create_argument_type const * params
-    );
-
-/**
- * @brief Selects an appropriate shader for the paremeters, builds and assigns it
- *
- * @return TRUE on success, false on failure.
- */
-static boolean select_shader
     (
         object_group_type * object_group,
         object_group_create_argument_type const * params
@@ -156,13 +137,18 @@ void object_group_init
 
  object_group_type * object_group_create
     (
-        object_group_create_argument_type const * params,
-        boolean * status
+        object_group_create_argument_type const * params
     )
 {
     object_group_type * object_group;
+    boolean             status;
+    vector_type*        vertex_shader_code;
+    vector_type*        fragment_shader_code;
 
     object_group = calloc( 1, sizeof( object_group_type ) );
+
+	object_group->is_3d = !params->is_2d;
+	object_group->use_uvs = params->use_uvs;
 
     /* Init the array of object positions */
     object_group->objects = vector_init( sizeof( object_type* ) );
@@ -174,13 +160,33 @@ void object_group_init
     vector_push_back( active_object_groups.active_object_groups, &object_group );
 
     /* Build the shader to use */
-    *status = select_shader( object_group, params );
-    CHECK_STATUS( *status );
+    vertex_shader_code = vector_init(sizeof(sint8_t));
+    fragment_shader_code = vector_init(sizeof(sint8_t));
+
+    status = file_read( params->vertex_shader_filename, vertex_shader_code );
+    if( !status )
+    {
+        return NULL;
+    }
+    status = file_read( params->fragment_shader_filename, fragment_shader_code );
+    if( !status )
+    {
+        return NULL;
+    }
+
+    status = shader_build( &object_group->shader, vector_access( vertex_shader_code, 0 ), vector_access( fragment_shader_code, 0)  );
+    if( !status )
+    {
+        return NULL;
+    }
+
+    vector_deinit( vertex_shader_code );
+    vector_deinit( fragment_shader_code );
 
     /* Build texture if required */
     if( params->use_uvs )
     {
-        *status = texture_init
+        status = texture_init
         (
             &object_group->texture,
             params->texture_filename,
@@ -188,16 +194,22 @@ void object_group_init
             &object_group->shader,
             TEXTURE_UNIFORM_NAME
         );
-        CHECK_STATUS( *status );
+        if( !status )
+        {
+            return NULL;
+        }
     }
 
     /* Do openGL specific init */
-    *status = openGL_init
+    status = openGL_init
         (
             object_group,
             params
         );
-    CHECK_STATUS( *status );
+    if( !status )
+    {
+        return NULL;
+    }
 
     return object_group;
 }
@@ -243,7 +255,7 @@ static boolean openGL_init
     )
 {
     GLuint              vertex_buffer_object;
-    GLuint              element_buffer_object;
+    /*GLuint              element_buffer_object;*/
     GLuint              uv_buffer_object;
     GLuint              normal_buffer_object;
     GLuint              bone_buffer_object;
@@ -251,7 +263,7 @@ static boolean openGL_init
     /* Assign the vertexes to the object group */
     glGenVertexArrays( 1, &object_group->vertex_array_object );
     glGenBuffers( 1, &vertex_buffer_object );
-    glGenBuffers( 1, &element_buffer_object );
+    /*glGenBuffers( 1, &element_buffer_object );*/
     glGenBuffers( 1, &uv_buffer_object );
     glGenBuffers( 1, &normal_buffer_object );
     glGenBuffers( 1, &bone_buffer_object );
@@ -261,8 +273,8 @@ static boolean openGL_init
     glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer_object );
     glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( vec3_type ), params->vertices, GL_STATIC_DRAW );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer_object );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, params->triangle_count * sizeof( vertex_triangle_type ), params->triangles, GL_STATIC_DRAW );
+    /* glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer_object );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, params->triangle_count * sizeof( vertex_triangle_type ), params->triangles, GL_STATIC_DRAW ); */
 
     glVertexAttribPointer( VERTEX_ATTRIB_POINTER, 3, GL_FLOAT, GL_FALSE, 0, NULL );
     glEnableVertexAttribArray( VERTEX_ATTRIB_POINTER );
@@ -283,7 +295,7 @@ static boolean openGL_init
         glEnableVertexAttribArray( NORMAL_ATTRIB_POINTER );
     }
 
-    if( params->bone_association_size )
+    if( params->bone_association_size > 0 )
     {
         glBindBuffer( GL_ARRAY_BUFFER, bone_buffer_object );
 	    glBufferData( GL_ARRAY_BUFFER, params->vertex_count * params->bone_association_size * sizeof( GLfloat ), vector_access( params->bone_associations, 0 ), GL_STATIC_DRAW );
@@ -295,22 +307,6 @@ static boolean openGL_init
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
     return TRUE;
-}
-
-static boolean select_shader
-    (
-        object_group_type * object_group,
-        object_group_create_argument_type const * params
-    )
-{
-    if( ( !params->is_2d ) &&
-        ( params->use_uvs ) &&
-        ( !params->is_lighted ) )
-    {
-        return shader_build( &object_group->shader, vertex_shader_3d_uv_no_light, fragment_shader_3d_uv_no_light );
-    }
-
-    return FALSE;
 }
 
 static void object_group_global_frame_cb
@@ -361,15 +357,19 @@ static void object_group_frame_cb
 {
     uint16_t i;
     uint16_t len;
-
+	
     shader_use( &object_group->shader );
-    texture_use( &object_group->texture );
-    camera_set_active( object_group->camera, &object_group->shader );
 
+	if ( object_group->use_uvs )
+	{
+		texture_use(&object_group->texture);
+	}
+    
+    camera_set_active( object_group->camera, &object_group->shader );
+	
     len = vector_size( object_group->objects );
 
     glBindVertexArray( object_group->vertex_array_object );
-
     for( i = 0; i < len; ++i )
     {
         object_type * object;
@@ -378,8 +378,11 @@ static void object_group_frame_cb
 
         if( object->is_visible )
         {
-            shader_set_uniform_mat4( &object_group->shader, "model_matrix", &object->model_matrix );
-            glDrawElements( GL_TRIANGLES, object_group->vertex_count, GL_UNSIGNED_INT, 0 );
+			if(object_group->is_3d )
+			{
+				shader_set_uniform_mat4(&object_group->shader, "model_matrix", &object->model_matrix);
+			}
+			glDrawArrays( GL_TRIANGLES, 0, object_group->vertex_count );
         }
     }
 

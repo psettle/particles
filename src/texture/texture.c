@@ -8,6 +8,7 @@
 **********************************************************************/
 
 #include "texture.h"
+#include "common_util.h"
 #include <stdio.h>
 
 /**********************************************************************
@@ -33,6 +34,12 @@ boolean texture_init
 
 	/* use soil to load the image data */
 	image = SOIL_load_image( image_filename, &width, &height, 0, SOIL_LOAD_RGBA);
+    if( !image )
+    {
+        DEBUG_LINE();
+        return FALSE;
+    }
+
 	/* generate and bind a texture */
 	glGenTextures( 1, &texture->texture_id );
 	glBindTexture(GL_TEXTURE_2D, texture->texture_id );

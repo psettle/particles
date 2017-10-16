@@ -147,6 +147,63 @@ void system_set_camera
         5, 6, 7,
     };
 
+    object_group_create_argument_type texture_cube =
+    {
+        FALSE,
+        TRUE,
+        FALSE,
+        FALSE,
+        "images/test.jpg",
+        "shaders/vertex_shader_3d_uv_no_light.glsl",
+        "shaders/fragment_shader_3d_uv_no_light.glsl",
+        8,
+        (vec3_type*)vertices_raw,
+        NULL,
+        (uv_type*)uvs_raw,
+        NULL,
+        NULL,
+        NULL,
+        0,
+        4,
+        (vertex_triangle_type*)triangles_raw,
+        NULL,
+        GL_TEXTURE0
+    };
+
+	GLfloat hello_vertices_raw[] = {
+		-1.0f, -1.0f, 1.0f,
+		0.0f, 1.0f, -1.0f,
+		1.0f, -1.0f, 0.5f
+	};
+
+	GLuint hello_triangles_raw[] = {
+		0, 1, 2
+	};
+
+	object_group_create_argument_type hello_triangle =
+	{
+		TRUE,
+		FALSE,
+		FALSE,
+		FALSE,
+		NULL,
+		"shaders/vertex_2d_colour_no_light.glsl",
+		"shaders/fragment_2d_colour_no_light.glsl",
+		3,
+		(vec3_type*)hello_vertices_raw,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		0,
+		1,
+		(vertex_triangle_type*)hello_triangles_raw,
+		NULL,
+		NULL
+	};
+
+
 boolean system_init
     (
         void
@@ -157,8 +214,6 @@ boolean system_init
     vec3_type up;
     object_group_type* object_group;
     object_type* object;
-    object_group_create_argument_type params;
-    boolean status;
 
     memset( &system_instance, 0, sizeof( system_type ) );
 
@@ -168,19 +223,13 @@ boolean system_init
     object_group_init();
     openGL_system_init();
 
-    memset( &params, 0, sizeof( params ) );
-    params.texture_filename = "images/test.jpg";
-    params.vertices = (vec3_type*)vertices_raw;
-    params.vertex_count = sizeof( vertices_raw ) / sizeof ( vec3_type );
-    params.triangles = (vertex_triangle_type*)triangles_raw;
-    params.triangle_count = sizeof( triangles_raw ) / sizeof( vertex_triangle_type );
-    params.uvs = (uv_type*)uvs_raw;
-    params.use_uvs = TRUE;
+    object_group = object_group_create( &hello_triangle);
+    if( !object_group )
+    {
+        return FALSE;
+    }
 
-    object_group = object_group_create( &params, &status );
-    CHECK_STATUS( status );
-
-    vec3_set( &from, 1.0f, 0.0f, 1.0f );
+    vec3_set( &from, 2.0f, 0.0f, 2.0f );
     vec3_set( &to, 0.0f, 0.0f, 0.0f );
     vec3_set( &up, 0.0f, 1.0f, 0.0f );
     camera_init( &system_camera_instance );
@@ -201,13 +250,16 @@ boolean system_init
             DEFAULT_FRONT,
             DEFAULT_BACK
         );
-
-    object = object_create( object_group, &status );
-    CHECK_STATUS( status );
+	
+    object = object_create( object_group );
+    if( !object )
+    {
+        return FALSE;
+    }
 
     object_set_visibility( object, TRUE );
-
-    return status;
+	
+    return TRUE;
 }
 
 void system_run
@@ -222,7 +274,7 @@ void system_run
             system_deinit();
             return;
         }
-
+		
         frame();
     }
 }

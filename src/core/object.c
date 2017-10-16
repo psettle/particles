@@ -33,8 +33,7 @@
 
 object_type * object_create
     (
-        object_group_type * object_group,
-        boolean * status
+        object_group_type * object_group
     )
 {
     object_type * object;
@@ -46,8 +45,6 @@ object_type * object_create
     object->bones = vector_init( sizeof( bone_type ) );
 
     vector_push_back( object_group->objects, &object );
-
-    *status = TRUE;
     return object;
 }
 

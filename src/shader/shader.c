@@ -94,17 +94,26 @@ boolean shader_build
     /* Compile vertex shader */
     status = shader_compile( vertex_shader_code, SHADER_TYPE_VERTEX, &vertex_shader_handle );
 
-    CHECK_STATUS( status );
+    if( !status )
+    {
+        return FALSE;
+    }
 
     /* Compile fragment shader */
     status = shader_compile( fragment_shader_code, SHADER_TYPE_FRAGMENT, &fragment_shader_handle );
 
-    CHECK_STATUS( status );
+    if( !status )
+    {
+        return FALSE;
+    }
 
     /* Link the program */
     status = shader_link( vertex_shader_handle, fragment_shader_handle, &p_shader->program_id );
 
-    CHECK_STATUS( status );
+    if( !status )
+    {
+        return FALSE;
+    }
 
     return TRUE;
 }

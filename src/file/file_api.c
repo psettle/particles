@@ -31,7 +31,7 @@ boolean file_exists
         sint8_t const * filename
     )
 {
-    return ( access(filename, F_OK) != -1 );
+    return ( access( filename, F_OK ) != -1 );
 } /* file_exists */
 
 boolean file_read
@@ -47,12 +47,17 @@ boolean file_read
 
     /* If the file doesn't exist, return false */
     status = file_exists( filename );
-    CHECK_STATUS( status );
+    if( !status )
+    {
+        DEBUG_LINE();
+        return FALSE;
+    }
 
     fp = fopen( filename, "r" );
 
     if( NULL == fp )
     {
+        DEBUG_LINE();
         return FALSE;
     }
 
@@ -87,6 +92,7 @@ boolean file_write
 
     if( NULL == fp )
     {
+        DEBUG_LINE();
         return FALSE;
     }
 

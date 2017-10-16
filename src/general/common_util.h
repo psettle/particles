@@ -18,20 +18,12 @@
 
 #define CHECK_STATUS_DEBUG      TRUE
 
-#define CHECK_STATUS( status )\
-do\
-{\
-    if( !( status ) )\
-    {\
-        if( CHECK_STATUS_DEBUG )\
-        {\
-        const char* err = "Fail on line " " of file "  " \n";\
-        printf( "%s", err );\
-        }\
-        return FALSE;\
-    }\
-}\
-while( FALSE )
+#if CHECK_STATUS_DEBUG
+    #define DEBUG_LINE() printf("Fail on line %d of %s\n", __LINE__, __FILE__ )
+#else
+    #define DEBUG_LING()
+#endif
+
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))

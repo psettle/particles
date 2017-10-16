@@ -55,6 +55,8 @@ typedef struct object_group_create_argument_struct
     boolean                      is_lighted;
     boolean                      use_normals;
     sint8_t              const * texture_filename;
+    sint8_t              const * vertex_shader_filename;
+    sint8_t              const * fragment_shader_filename;
     uint32_t                     vertex_count;
     vec3_type            const * vertices;
     vec3_type            const * normals;
@@ -65,7 +67,7 @@ typedef struct object_group_create_argument_struct
     uint32_t                     bone_association_size;
     uint32_t                     triangle_count;
     vertex_triangle_type const * triangles;
-    vector_type                  default_bones;
+    vector_type                * default_bones;
     uint32_t                     texture_slot;
 } object_group_create_argument_type;
 
@@ -95,6 +97,8 @@ typedef struct object_group_struct
     vector_type     * objects; /* Array of object_type* representing each unique object in the group */
     uint32_t          vertex_count;
     vector_type     * buffers_to_delete; /* GLuint Random buffers that must be deleted when the object goes out of scope */
+	boolean			  is_3d;
+	boolean			  use_uvs;
 } object_group_type;
 
 /**********************************************************************
