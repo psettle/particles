@@ -67,11 +67,13 @@ INCLUDE_FORMATTED=$(addprefix -I, $(INCLUDE))
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS_FINAL) $(EXECUTABLE_MAIN_O)
-	$(CC) $(LDFLAGS) $(OBJECTS_FINAL) $(EXECUTABLE_MAIN_O) $(LIBS) -o $@
+	@$(CC) $(LDFLAGS) $(OBJECTS_FINAL) $(EXECUTABLE_MAIN_O) $(LIBS) -o $@
+	@echo $@
 
 $(OBJECTS_FINAL_PLUS_MAIN): out/%.o : %.c
 	@mkdir -p out/$(dir $<)
-	$(CC) $(CFLAGS) $(INCLUDE_FORMATTED) $< -o $@
+	@$(CC) $(CFLAGS) $(INCLUDE_FORMATTED) $< -o $@
+	@echo $<
 
 
 .PHONY: clean
