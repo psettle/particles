@@ -26,6 +26,21 @@ typedef struct vector_struct
 } vector_type;
 
 /**********************************************************************
+                                MACROS
+**********************************************************************/
+
+/**
+ * @brief Access a pointer to an element of a vector
+ *
+ * @param type
+ *			The type of elements stored in the vector
+ *
+ * @return
+ *			An element of type type*
+ */
+#define vector_access( vector, index, type ) ( ( type* )vector_access_untyped( vector, index ) )
+
+/**********************************************************************
                              PROTOTYPES
 **********************************************************************/
 
@@ -105,7 +120,7 @@ void vector_pop_back
  * @return A pointer to the internal memory that holds the element
  * (Any vector function may reallocate this memory, so the pointer should be fetched every use)
  */
-void * vector_access
+void * vector_access_untyped
     (
         vector_type const * vector,
         uint32_t            index

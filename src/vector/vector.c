@@ -97,7 +97,7 @@ void vector_push_back
         resize( vector, vector->list_max * VECTOR_GROWTH_FACTOR );
     }
 
-    new_item_buffer = vector_access( vector, vector->item_count );
+    new_item_buffer = vector_access_untyped( vector, vector->item_count );
     memcpy( new_item_buffer, item, vector->item_size );
     vector->item_count += 1;
 }
@@ -111,7 +111,7 @@ void vector_push_front
     void * new_item_slot;
 
     shift_items( vector, 1, TRUE );
-    new_item_slot = vector_access( vector, 0 );
+    new_item_slot = vector_access_untyped( vector, 0 );
     memcpy( new_item_slot, item, vector->item_size );
 }
 
@@ -141,7 +141,7 @@ void vector_pop_front
 {
     void * old_item_slot;
 
-    old_item_slot = vector_access( vector, 0 );
+    old_item_slot = vector_access_untyped( vector, 0 );
     memcpy( item, old_item_slot, vector->item_size );
 
     shift_items( vector, 1, FALSE );
@@ -155,7 +155,7 @@ void vector_pop_back
 {
     void * old_item;
 
-    old_item = vector_access( vector, vector->item_count - 1);
+    old_item = vector_access_untyped( vector, vector->item_count - 1);
 
     memcpy( item, old_item, vector->item_size );
 
@@ -169,7 +169,7 @@ void vector_pop_back
     }
 }
 
-void * vector_access
+void * vector_access_untyped
     (
         vector_type const * vector,
         uint32_t            index
@@ -282,7 +282,7 @@ void vector_remove
     {
         uint8_t * item;
 
-        item = (uint8_t *)vector_access( vector, i );
+        item = (uint8_t *)vector_access_untyped( vector, i );
 
         if( 0 == memcmp( item, target, vector->item_size ) )
         {

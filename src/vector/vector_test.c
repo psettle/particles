@@ -202,7 +202,7 @@ static void print_vector( vector_type* vector )
 
     for( i = 0; i < len; ++i )
     {
-        element = *(uint32_t*)vector_access( vector, i );
+        element = *vector_access( vector, i, uint32_t );
         printf("%d: %d\n", i, element);
     }
 }

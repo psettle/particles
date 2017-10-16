@@ -96,7 +96,7 @@ boolean file_write
         return FALSE;
     }
 
-    fprintf( fp, "%s", vector_access( contents, 0 ) );
+    fprintf( fp, "%s", vector_access( contents, 0, sint8_t* ) );
 
     fclose( fp );
 

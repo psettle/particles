@@ -7,12 +7,13 @@
 */
 
 #include    "system.h"
-#include    "stdio.h"
+#include    "texture_cube.h"
 
 int main()
 {
     if ( system_init() )
     {
+		texture_cube_start();
         system_run();
     }
 

@@ -73,7 +73,6 @@ static void send_system_event
 
 /* The singleton system instance */
 static system_type system_instance;
-static camera_type system_camera_instance;
 
 /**********************************************************************
                              FUNCIONS
@@ -118,90 +117,6 @@ void system_set_camera
     send_system_event( &event_data );
 }
 
-    GLfloat vertices_raw[] = {
-         0.5f, 0.5f, 0.5f,
-         0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f,
-        -0.5f, 0.5f, 0.5f,
-         0.5f, 0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, 0.5f, -0.5f,
-    };
-
-    GLfloat uvs_raw[] = {
-        1.0f,  0.0f,
-        1.0f,  1.0f,
-        0.0f,  1.0f,
-        0.0f,  0.0f,
-        1.0f,  0.0f,
-        1.0f,  1.0f,
-        0.0f,  1.0f,
-        0.0f,  0.0f,
-    };
-
-    GLuint triangles_raw[] = {
-        0, 1, 3,
-        1, 2, 3,
-        4, 5, 7,
-        5, 6, 7,
-    };
-
-    object_group_create_argument_type texture_cube =
-    {
-        FALSE,
-        TRUE,
-        FALSE,
-        FALSE,
-        "images/test.jpg",
-        "shaders/vertex_shader_3d_uv_no_light.glsl",
-        "shaders/fragment_shader_3d_uv_no_light.glsl",
-        8,
-        (vec3_type*)vertices_raw,
-        NULL,
-        (uv_type*)uvs_raw,
-        NULL,
-        NULL,
-        NULL,
-        0,
-        4,
-        (vertex_triangle_type*)triangles_raw,
-        NULL,
-        GL_TEXTURE0
-    };
-
-	GLfloat hello_vertices_raw[] = {
-		-1.0f, -1.0f, 1.0f,
-		0.0f, 1.0f, -1.0f,
-		1.0f, -1.0f, 0.5f
-	};
-
-	GLuint hello_triangles_raw[] = {
-		0, 1, 2
-	};
-
-	object_group_create_argument_type hello_triangle =
-	{
-		TRUE,
-		FALSE,
-		FALSE,
-		FALSE,
-		NULL,
-		"shaders/vertex_2d_colour_no_light.glsl",
-		"shaders/fragment_2d_colour_no_light.glsl",
-		3,
-		(vec3_type*)hello_vertices_raw,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		0,
-		1,
-		(vertex_triangle_type*)hello_triangles_raw,
-		NULL,
-		NULL
-	};
 
 
 boolean system_init
@@ -209,12 +124,6 @@ boolean system_init
         void
     )
 {
-    vec3_type from;
-    vec3_type to;
-    vec3_type up;
-    object_group_type* object_group;
-    object_type* object;
-
     memset( &system_instance, 0, sizeof( system_type ) );
 
     system_instance.system_event_listeners    = vector_init( sizeof( system_event_callback ) );
@@ -223,42 +132,6 @@ boolean system_init
     object_group_init();
     openGL_system_init();
 
-    object_group = object_group_create( &hello_triangle);
-    if( !object_group )
-    {
-        return FALSE;
-    }
-
-    vec3_set( &from, 2.0f, 0.0f, 2.0f );
-    vec3_set( &to, 0.0f, 0.0f, 0.0f );
-    vec3_set( &up, 0.0f, 1.0f, 0.0f );
-    camera_init( &system_camera_instance );
-    camera_set_view
-        (
-            &system_camera_instance,
-            &from,
-            &to,
-            &up
-        );
-
-    camera_set_perspective
-        (
-            &system_camera_instance,
-            DEFAULT_FOV,
-            1920,
-            1080,
-            DEFAULT_FRONT,
-            DEFAULT_BACK
-        );
-	
-    object = object_create( object_group );
-    if( !object )
-    {
-        return FALSE;
-    }
-
-    object_set_visibility( object, TRUE );
-	
     return TRUE;
 }
 
@@ -311,8 +184,8 @@ static boolean openGL_system_init
 
     glViewport( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT );
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    /*glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);*/
 
     glfwSwapInterval( 0 );
 
@@ -370,7 +243,7 @@ static void frame
     len = vector_size( system_instance.frame_event_listeners );
     for( i = 0; i < len; ++i )
     {
-        cb = *( frame_event_callback * )vector_access( system_instance.frame_event_listeners, i );
+        cb = *vector_access( system_instance.frame_event_listeners, i, frame_event_callback );
         cb( &event_data );
     }
 
@@ -390,7 +263,7 @@ static void send_system_event
     len = vector_size( system_instance.system_event_listeners );
     for( i = 0; i < len; ++i )
     {
-        cb = *( system_event_callback * )vector_access( system_instance.system_event_listeners, i );
+        cb = *vector_access( system_instance.system_event_listeners, i, system_event_callback );
         cb( event_data );
     }
 }
