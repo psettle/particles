@@ -184,8 +184,8 @@ static boolean openGL_system_init
 
     glViewport( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT );
 
-    /*glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);*/
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     glfwSwapInterval( 0 );
 

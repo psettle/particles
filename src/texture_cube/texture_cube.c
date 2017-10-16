@@ -52,13 +52,13 @@ GLfloat vertices_raw[] = {
 
 GLfloat uvs_raw[] = {
     1.0f,  0.0f,
-    1.0f,  0.5f,
+    1.0f,  1.0f,
     0.0f,  1.0f,
     0.0f,  0.0f,
-    0.5f,  0.0f,
+    1.0f,  0.0f,
     1.0f,  1.0f,
-    0.0f,  0.7f,
-    0.5f,  0.5f,
+    0.0f,  1.0f,
+    0.0f,  0.0f,
 };
 
 GLuint triangles_raw[] = {
@@ -134,7 +134,7 @@ static void create_camera
 	camera_init( &camera );
 	camera_set_perspective( &camera, 110.0f * M_PI / 180.0f, 1920, 1080, 0.1f, 10.0f );
 
-	vec3_set( &from, 0.0f, 2.0f, -1.0f );
+	vec3_set( &from, 2.0f, 2.0f, -1.0f );
 	vec3_set( &to, 0.0f, 0.0f, 0.0f );
 	vec3_set( &up, 0.0f, 1.0f, 0.0f );
 

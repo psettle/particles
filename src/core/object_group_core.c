@@ -407,7 +407,8 @@ static void object_group_frame_cb
 			{
 				shader_set_uniform_mat4( &object_group->shader, "model_matrix", &object->model_matrix );
 			}
-			glDrawElements( GL_TRIANGLES, object_group->triangle_count, GL_UNSIGNED_INT, 0 );
+			
+			glDrawElements( GL_TRIANGLES, object_group->triangle_count * sizeof( vertex_triangle_type ) / sizeof( GLuint ), GL_UNSIGNED_INT, 0 );
         }
     }
 
