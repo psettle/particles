@@ -33,6 +33,15 @@ void vec3_set
     vec3->z = z;
 }
 
+void vec3_cpy
+    (
+        vec3_type       * vec3,
+        vec3_type const * source
+    )
+{
+    vec3_set( vec3, source->x, source->y, source->z );
+}
+
 GLfloat vec3_length
     (
         vec3_type * vec3
@@ -103,6 +112,18 @@ void vec3_add
     out->x = left->x + right->x;
     out->y = left->y + right->y;
     out->z = left->z + right->z;
+}
+
+void vec3_scale
+    (
+    vec3_type*        out,
+    GLfloat           scaling_factor,
+    vec3_type const * in
+    )
+{
+    out->x = in->x * scaling_factor;
+    out->y = in->y * scaling_factor;
+    out->z = in->z * scaling_factor;
 }
 
 void vec4_set
@@ -324,7 +345,7 @@ void mat4_rotate
 void mat4_translate
     (
         mat4_type       * to_translate,
-        vec3_type       * amount
+        vec3_type const * amount
     )
 {
     mat4_type translation_matrix;
@@ -334,25 +355,25 @@ void mat4_translate
     translation_matrix.x.z = 0.0f;
     translation_matrix.x.w = 0.0f;
 
-    translation_matrix.x.x = 0.0f;
-    translation_matrix.x.y = 1.0f;
-    translation_matrix.x.z = 0.0f;
-    translation_matrix.x.w = 0.0f;
+    translation_matrix.y.x = 0.0f;
+    translation_matrix.y.y = 1.0f;
+    translation_matrix.y.z = 0.0f;
+    translation_matrix.y.w = 0.0f;
 
-    translation_matrix.x.x = 0.0f;
-    translation_matrix.x.y = 0.0f;
-    translation_matrix.x.z = 1.0f;
-    translation_matrix.x.w = 0.0f;
+    translation_matrix.z.x = 0.0f;
+    translation_matrix.z.y = 0.0f;
+    translation_matrix.z.z = 1.0f;
+    translation_matrix.z.w = 0.0f;
 
-    translation_matrix.x.x = amount->x;
-    translation_matrix.x.y = amount->y;
-    translation_matrix.x.z = amount->z;
-    translation_matrix.x.w = 1.0f;
+    translation_matrix.w.x = amount->x;
+    translation_matrix.w.y = amount->y;
+    translation_matrix.w.z = amount->z;
+    translation_matrix.w.w = 1.0f;
 
     mat4_multiply
-    (
+        (
         to_translate,
         &translation_matrix,
         to_translate
-    );
+        );
 }

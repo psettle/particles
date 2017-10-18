@@ -51,9 +51,9 @@ EXECUTABLE=out/particles.exe
 EXECUTABLE_MAIN=src/main.c
 EXECUTABLE_MAIN_O=$(EXECUTABLE_MAIN:%.c=out/%.o)
 
-LDFLAGS= -Wall -m32 -ansi -pedantic -O2
+LDFLAGS= -Wall -m32 -ansi -pedantic -O3
 CC=gcc
-CFLAGS=-c -Wall -MMD -m32 -ansi -pedantic -O2
+CFLAGS=-c -Wall -MMD -m32 -ansi -pedantic -O3
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_FINAL=$(OBJECTS:%.o=out/%.o)
 OBJECTS_FINAL_PLUS_MAIN=$(OBJECTS_FINAL)

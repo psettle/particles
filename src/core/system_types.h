@@ -29,6 +29,24 @@ typedef struct camera_struct
     vec3_type position;
 } camera_type;
 
+
+/**********************************************************************
+                           FRAME EVENT TYPES
+**********************************************************************/
+
+/* Event passed when a new frame is starting */
+typedef struct frame_event_struct
+{
+    GLdouble timestamp;
+    GLdouble timesince_last_frame;
+} frame_event_type;
+
+typedef void ( * frame_event_callback )
+    (
+        frame_event_type const * event_data
+    );
+
+
 /**********************************************************************
                           OBJECT GROUP TYPES
 **********************************************************************/
@@ -65,7 +83,8 @@ typedef struct object_struct
 
 typedef void(*object_frame_cb_type)
     (
-    object_type * object
+    frame_event_type const * frame_data,
+    object_type*             cube
     );
 
 /* Represents a group of objects that use the same vertexes, shaders and textures */
@@ -109,22 +128,6 @@ typedef struct object_group_create_argument_struct
     object_frame_cb_type         object_frame_cb;
 } object_group_create_argument_type;
 
-
-
-/**********************************************************************
-                           FRAME EVENT TYPES
-**********************************************************************/
-
-/* Event passed when a new frame is starting */
-typedef struct frame_event_struct
-{
-    GLdouble timestamp;
-} frame_event_type;
-
-typedef void ( * frame_event_callback )
-    (
-        frame_event_type const * event_data
-    );
 
 /**********************************************************************
                             SYSTEM EVENT TYPES

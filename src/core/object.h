@@ -33,4 +33,23 @@ void object_delete
         object_type         * object
     );
 
+void object_rotate
+    (
+        object_type         * object,
+        vec3_type const     * axis,
+        GLdouble              angle /* rad */
+    );
+
+void object_translate
+    (
+        object_type         * object,
+        vec3_type const     * shift
+    );
+
+void object_set_position
+    (
+        object_type         * object,
+        vec3_type const     * position
+    );
+
 #endif /* OBJECT_H */

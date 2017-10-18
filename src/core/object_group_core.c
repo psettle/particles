@@ -398,7 +398,7 @@ static void object_group_frame_cb
 
         if( object_group->object_frame_cb )
         {
-            object_group->object_frame_cb( object );
+            object_group->object_frame_cb( event_data, object );
         }
 
         if( object->is_visible )

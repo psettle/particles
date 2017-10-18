@@ -74,6 +74,13 @@ static void send_system_event
 /* The singleton system instance */
 static system_type system_instance;
 
+#if( PRINT_FRAMERATE )
+
+static GLdouble second_start_time;
+static uint32_t frames_since_second_start;
+
+#endif
+
 /**********************************************************************
                              FUNCIONS
 **********************************************************************/
@@ -131,6 +138,11 @@ boolean system_init
 
     object_group_init();
     openGL_system_init();
+
+#if( PRINT_FRAMERATE )
+    second_start_time = glfwGetTime();
+    frames_since_second_start = 0;
+#endif
 
     return TRUE;
 }
@@ -223,6 +235,7 @@ static void frame
     uint32_t                i;
     frame_event_callback    cb;
     frame_event_type        event_data;
+    static GLdouble         last_timestamp = 0.0;
 
     /* Check for close signal */
     if ( ( glfwGetKey( system_instance.glfw_window, GLFW_KEY_ESCAPE ) == GLFW_PRESS ) ||
@@ -240,6 +253,21 @@ static void frame
     /* Send the frame events out */
     memset( &event_data, 0, sizeof( frame_event_type ) );
     event_data.timestamp = glfwGetTime();
+    event_data.timesince_last_frame = event_data.timestamp - last_timestamp;
+    last_timestamp = event_data.timestamp;
+
+#if( PRINT_FRAMERATE )
+    frames_since_second_start++;
+
+    if( event_data.timestamp > second_start_time + 1.0 )
+    {
+        printf("FPS: %d\n", frames_since_second_start);
+
+        second_start_time = event_data.timestamp;
+        frames_since_second_start = 0;
+    }
+#endif
+
     len = vector_size( system_instance.frame_event_listeners );
     for( i = 0; i < len; ++i )
     {
@@ -249,6 +277,7 @@ static void frame
 
     /* Swap the buffer (finishing the frame) */
     glfwSwapBuffers( system_instance.glfw_window );
+    glfwSwapInterval( 0 );
 }
 
 static void send_system_event

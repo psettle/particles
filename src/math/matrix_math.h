@@ -81,6 +81,15 @@ void vec3_set
     );
 
 /**
+ * @brief Set a from a source vector
+ */
+void vec3_cpy
+    (
+        vec3_type       * vec3,
+        vec3_type const * source
+    );
+
+/**
  * @brief Get the length of a vector
  */
 GLfloat vec3_length
@@ -133,6 +142,16 @@ void vec3_add
         vec3_type * out,
         vec3_type const * left,
         vec3_type const * right
+    );
+
+/**
+ * @brief out = in * scaling_factor
+ */
+void vec3_scale
+    (
+        vec3_type*        out,
+        GLfloat           scaling_factor,
+        vec3_type const * in
     );
 
 /**
@@ -211,7 +230,7 @@ void mat4_rotate
 void mat4_translate
     (
         mat4_type       * to_translate,
-        vec3_type       * amount
+        vec3_type const * amount
     );
 
 #endif /* MATRIX_MATH_H */

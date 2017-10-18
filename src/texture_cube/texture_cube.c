@@ -32,7 +32,8 @@ static void create_camera
 
 static void texture_cube_object_frame_cb
     (
-    object_type* cube
+    frame_event_type const *   frame_data,
+    object_type*               cube
     );
 
 /**********************************************************************
@@ -113,13 +114,25 @@ void texture_cube_start
     )
 {
     object_type* cube;
+    vec3_type amount;
+    uint32_t i;
+    GLfloat pos;
 
     create_camera();
     
     texture_cube_group = object_group_create( &texture_cube );
 
-    cube = object_create( texture_cube_group );
-    object_set_visibility( cube, TRUE );
+    for( i = 0; i < 10000; ++i )
+    {
+        cube = object_create( texture_cube_group );
+        object_set_visibility( cube, TRUE );
+    
+        pos = i * 0.005f;
+
+        vec3_set( &amount, pos - 7.0f, pos - 7.0f, pos - 7.0f );
+        object_translate( cube, &amount );
+    }
+    
 }
 
 static void create_camera
@@ -143,8 +156,13 @@ static void create_camera
 
 static void texture_cube_object_frame_cb
     (
-    object_type* cube
+    frame_event_type const *   frame_data,
+    object_type*               cube
     )
 {
-    printf("Frame\n");
+    vec3_type axis;
+
+    vec3_set( &axis, 0.5, 0.5, 0.5 );
+
+    object_rotate( cube, &axis, frame_data->timesince_last_frame );
 }
