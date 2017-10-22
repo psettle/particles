@@ -30,10 +30,9 @@ static void create_camera
     void
     );
 
-static void texture_cube_object_frame_cb
+static void texture_cube_object_cb
     (
-    frame_event_type const *   frame_data,
-    object_type*               cube
+    object_event_type const * event_data
     );
 
 /**********************************************************************
@@ -98,7 +97,7 @@ object_group_create_argument_type texture_cube =
     (vertex_triangle_type*)triangles_raw,
     NULL,
     GL_TEXTURE0,
-    texture_cube_object_frame_cb
+    texture_cube_object_cb
 };
 
 static object_group_type* texture_cube_group;
@@ -115,24 +114,16 @@ void texture_cube_start
 {
     object_type* cube;
     vec3_type amount;
-    uint32_t i;
-    GLfloat pos;
 
     create_camera();
     
     texture_cube_group = object_group_create( &texture_cube );
 
-    for( i = 0; i < 10000; ++i )
-    {
-        cube = object_create( texture_cube_group );
-        object_set_visibility( cube, TRUE );
-    
-        pos = i * 0.005f;
+    cube = object_create( texture_cube_group );
+    object_set_visibility( cube, TRUE );
 
-        vec3_set( &amount, pos - 7.0f, pos - 7.0f, pos - 7.0f );
-        object_translate( cube, &amount );
-    }
-    
+    vec3_set( &amount, 0.1f, 0.2f, 0.3f );
+    object_translate( cube, &amount ); 
 }
 
 static void create_camera
@@ -154,15 +145,24 @@ static void create_camera
     camera_set_view( &camera, &from, &to, &up );
 }
 
-static void texture_cube_object_frame_cb
+static void texture_cube_object_cb
     (
-    frame_event_type const *   frame_data,
-    object_type*               cube
+    object_event_type const * event_data
     )
 {
     vec3_type axis;
-
     vec3_set( &axis, 0.5, 0.5, 0.5 );
 
-    object_rotate( cube, &axis, frame_data->timesince_last_frame );
+    switch( event_data->event_type )
+    {
+    case OBJECT_EVENT_TYPE_RENDER_START:
+        break;
+    case OBJECT_EVENT_TYPE_RENDER_OBJECT:
+        object_rotate( event_data->event_data.render_object_data.object, &axis, event_data->event_data.render_object_data.time_since_last_frame );
+        break;
+    default:
+        break;
+    }
+
+
 }

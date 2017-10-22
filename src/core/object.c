@@ -10,6 +10,7 @@
 
 #include "object.h"
 #include "stdlib.h"
+#include "string.h"
 
 /**********************************************************************
                             LITERAL CONSTANTS
@@ -43,6 +44,7 @@ object_type * object_create
     vec3_set( &object->position, VEC3_NULL );
     mat4_set( &object->model_matrix, MAT4_IDENTITY );
     object->bones = vector_init( sizeof( bone_type ) );
+    object->shader = &( object_group->shader );
 
     vector_push_back( object_group->objects, &object );
     return object;
@@ -97,8 +99,16 @@ void object_translate
         vec3_type const     * shift
     )
 {
-    mat4_translate( &( object->model_matrix ), shift );
-    vec3_add( &( object->position ), &( object->position ), shift );
+    vec3_type zero;
+
+    vec3_set( &zero, VEC3_NULL );
+
+    /* Only shift is the amount of shift is non-zero */
+    if( 0 != memcmp( &zero, shift, sizeof( vec3_type ) ) )
+    {   
+        mat4_translate( &( object->model_matrix ), shift );
+        vec3_add( &( object->position ), &( object->position ), shift );
+    }
 }
 
 void object_set_position
@@ -114,11 +124,6 @@ void object_set_position
     object_translate( object, &neg_position ); 
 
     /* Translate to new position, if the new position isn't origin. */
-    if( ( 0 != position->x ) ||
-        ( 0 != position->y ) ||
-        ( 0 != position->z ) )
-    {
-        object_translate( object, position );
-    }
+    object_translate( object, position );
     
 }

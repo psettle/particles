@@ -148,11 +148,11 @@ void object_group_init
 
     object_group = calloc( 1, sizeof( object_group_type ) );
 
-    object_group->is_3d                    = !params->is_2d;
-    object_group->use_uvs                = params->use_uvs;
-    object_group->vertex_count            = params->vertex_count;
+    object_group->is_3d                 = !params->is_2d;
+    object_group->use_uvs               = params->use_uvs;
+    object_group->vertex_count          = params->vertex_count;
     object_group->triangle_count        = params->triangle_count;
-    object_group->object_frame_cb        = params->object_frame_cb;
+    object_group->object_cb             = params->object_cb;
     object_group->camera                = active_camera;
 
     /* Init the array of object positions */
@@ -377,35 +377,48 @@ static void object_group_frame_cb
 {
     uint16_t i;
     uint16_t len;
+    object_event_type object_event;
     
-    shader_use( &object_group->shader );
+    shader_use( &( object_group->shader ) );
 
     if ( object_group->use_uvs )
     {
-        texture_use(&object_group->texture);
+        texture_use( &( object_group->texture ) );
     }
     
-    camera_set_active( object_group->camera, &object_group->shader );
+    camera_set_active( object_group->camera, &( object_group->shader ) );
     
     len = vector_size( object_group->objects );
 
     glBindVertexArray( object_group->vertex_array_object );
+
+    if( NULL != object_group->object_cb )
+    {
+        object_event.event_type = OBJECT_EVENT_TYPE_RENDER_START;
+        object_event.event_data.render_start_data.shader = &( object_group->shader );
+        object_group->object_cb( &object_event );
+
+        object_event.event_type = OBJECT_EVENT_TYPE_RENDER_OBJECT;
+        object_event.event_data.render_object_data.time_since_last_frame = event_data->timesince_last_frame;
+    }
+
     for( i = 0; i < len; ++i )
     {
-        object_type * object;
+        object_type* object;
 
         object = *vector_access( object_group->objects, i, object_type* );
 
-        if( object_group->object_frame_cb )
+        if( NULL != object_group->object_cb )
         {
-            object_group->object_frame_cb( event_data, object );
+            object_event.event_data.render_object_data.object = object;
+            object_group->object_cb( &object_event );
         }
 
         if( object->is_visible )
         {
             if(object_group->is_3d )
             {
-                shader_set_uniform_mat4( &object_group->shader, "model_matrix", &object->model_matrix );
+                shader_set_uniform_mat4( object->shader, "model_matrix", &object->model_matrix );
             }
             
             glDrawElements( GL_TRIANGLES, object_group->triangle_count * sizeof( vertex_triangle_type ) / sizeof( GLuint ), GL_UNSIGNED_INT, 0 );

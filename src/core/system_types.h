@@ -78,13 +78,44 @@ typedef struct object_struct
     boolean       is_visible;
     vec3_type     position;
     mat4_type     model_matrix;
-    vector_type * bones; /* Vector of bone_type, for each bone in the object */
+    shader_type*  shader;
+    vector_type*  bones; /* Vector of bone_type, for each bone in the object */
 } object_type;
 
-typedef void(*object_frame_cb_type)
+typedef uint8_t object_event_type_t8; enum
+{
+    OBJECT_EVENT_TYPE_RENDER_START,     /* Rendering of an object type has started, the shader is bound and uniforms can be passed in. */
+    OBJECT_EVENT_TYPE_RENDER_OBJECT,    /* Rendering of a particular object is about to start changes to that objects position, rotation or scale will appear in the next frame. */
+
+    OBJECT_EVENT_TYPE_RENDER_COUNT
+};
+
+typedef struct object_event_type_render_start_data_struct
+{
+    shader_type const *  shader;
+} object_event_type_render_start_data_type;
+
+typedef struct object_event_type_render_object_data_struct
+{
+    object_type*         object;
+    GLdouble             time_since_last_frame;
+} object_event_type_render_object_data_type;
+
+typedef union object_event_data_union
+{
+    object_event_type_render_start_data_type  render_start_data;    /* Data for OBJECT_EVENT_TYPE_RENDER_START */
+    object_event_type_render_object_data_type render_object_data;   /* Data for OBJECT_EVENT_TYPE_RENDER_OBJECT */
+} object_event_data_type;
+
+typedef struct object_event_struct
+{
+    object_event_type_t8     event_type;
+    object_event_data_type   event_data;
+} object_event_type;
+
+typedef void (*object_cb_type)
     (
-    frame_event_type const * frame_data,
-    object_type*             cube
+    object_event_type const * event_data
     );
 
 /* Represents a group of objects that use the same vertexes, shaders and textures */
@@ -99,9 +130,9 @@ typedef struct object_group_struct
     uint32_t          vertex_count;
     uint32_t          triangle_count;
     vector_type     * buffers_to_delete; /* GLuint Random buffers that must be deleted when the object goes out of scope */
-    boolean              is_3d;
-    boolean              use_uvs;
-    object_frame_cb_type object_frame_cb;
+    boolean           is_3d;
+    boolean           use_uvs;
+    object_cb_type    object_cb;
 } object_group_type;
 
 typedef struct object_group_create_argument_struct
@@ -125,7 +156,7 @@ typedef struct object_group_create_argument_struct
     vertex_triangle_type const * triangles;
     vector_type                * default_bones;
     uint32_t                     texture_slot;
-    object_frame_cb_type         object_frame_cb;
+    object_cb_type               object_cb;
 } object_group_create_argument_type;
 
 

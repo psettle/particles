@@ -8,9 +8,9 @@
                             GENERAL INCLUDES
 **********************************************************************/
 
-#include "matrix_math.h"
 #include "math.h"
-#include <string.h>
+#include "string.h"
+#include "matrix_math.h"
 
 /**********************************************************************
                               PROTOTYPES
@@ -175,9 +175,9 @@ void mat4_set
 
 void mat4_multiply
     (
-        mat4_type * product,
-        mat4_type * left,
-        mat4_type * right
+        mat4_type*        product,
+        mat4_type const * left,
+        mat4_type const * right
     )
 {
     mat4_type right_copy;
@@ -211,6 +211,7 @@ void mat4_multiply
     product->w.y = vec4_dot( &row_y, &right_copy.w );
     product->w.z = vec4_dot( &row_z, &right_copy.w );
     product->w.w = vec4_dot( &row_w, &right_copy.w );
+    return;
 }
 
 void mat4_look_at
@@ -236,12 +237,12 @@ void mat4_look_at
     view->x.x = left.x;
     view->x.y = up_local.x;
     view->x.z = forward.x;
-    view->x.w = 0.0;
+    view->x.w = 0.0f;
 
     view->y.x = left.y;
     view->y.y = up_local.y;
     view->y.z = forward.y;
-    view->y.w = 0.0;
+    view->y.w = 0.0f;
 
     view->z.x = left.z;
     view->z.y = up_local.z;

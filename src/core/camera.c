@@ -34,7 +34,7 @@ void camera_set_active
         shader_type const * shader
     )
 {
-    shader_set_uniform_mat4( shader, VIEW_PROJECTION_UNIFORM, &camera->projection_view_matrix );
+    shader_set_uniform_mat4( shader, VIEW_PROJECTION_UNIFORM, &( camera->projection_view_matrix ) );
 }
 
 void camera_set_view
@@ -45,10 +45,10 @@ void camera_set_view
         vec3_type const * up
     )
 {
-    mat4_look_at( &camera->view_matrix, from, to, up );
+    mat4_look_at( &( camera->view_matrix ), from, to, up );
 
     /* Recalculate the position and projection view matrix */
-    mat4_multiply( &camera->projection_view_matrix, &camera->projection_matrix, &camera->view_matrix);
+    mat4_multiply( &( camera->projection_view_matrix ), &( camera->projection_matrix ), &( camera->view_matrix ) );
     camera->position = *from;
 }
 

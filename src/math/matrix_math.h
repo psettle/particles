@@ -192,9 +192,9 @@ void mat4_set
  */
 void mat4_multiply
     (
-        mat4_type * product,
-        mat4_type * left,
-        mat4_type * right
+        mat4_type*        product,
+        mat4_type const * left,
+        mat4_type const * right
     );
 
 /**
