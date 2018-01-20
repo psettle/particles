@@ -20,6 +20,7 @@ INCLUDE += src/texture_cube
 
 #source includes
 SOURCES += src/file/file_api.c
+SOURCES += src/file/model_loader.c
 
 SOURCES += src/shader/shader.c
 
@@ -51,7 +52,7 @@ EXECUTABLE=out/particles.exe
 EXECUTABLE_MAIN=src/main.c
 EXECUTABLE_MAIN_O=$(EXECUTABLE_MAIN:%.c=out/%.o)
 
-LDFLAGS= -Wall -m32 -ansi -pedantic -O3
+LDFLAGS=-Wall -m32 -ansi -pedantic -O3
 CC=gcc
 CFLAGS=-c -Wall -MMD -m32 -ansi -pedantic -O3
 OBJECTS=$(SOURCES:.c=.o)

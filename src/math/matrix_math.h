@@ -37,6 +37,9 @@
                                 TYPES
 **********************************************************************/
 
+/**
+ * @brief
+ */
 typedef struct vec3_struct
 {
     GLfloat x;
@@ -44,6 +47,9 @@ typedef struct vec3_struct
     GLfloat z;
 } vec3_type;
 
+/**
+ * @brief
+ */
 typedef struct vec4_struct
 {
     GLfloat x;
@@ -52,6 +58,9 @@ typedef struct vec4_struct
     GLfloat w;
 } vec4_type;
 
+/**
+ * @brief
+ */
 /* Note: Columns then Rows */
 typedef struct mat4_struct
 {
@@ -220,6 +229,9 @@ void mat4_perspective
         GLfloat           back            /* Distance from the front of the camera to the last thing that can be rendered  (10.0 is normal) */
     );
 
+/**
+ * @brief Rotate an object around the universal centre.
+ */
 void mat4_rotate
     (
         mat4_type       * to_rotate,
@@ -227,6 +239,9 @@ void mat4_rotate
         GLfloat           angle_rad
     );
 
+/**
+ * @brief Translate a mat4 relative to the universal centre.
+ */
 void mat4_translate
     (
         mat4_type       * to_translate,

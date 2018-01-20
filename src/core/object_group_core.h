@@ -27,17 +27,6 @@ void uv_set
     );
 
 /**
- * @brief Set the value of a vertex triangle
- */
-void vertex_triangle_set
-    (
-        vertex_triangle_type    * vertex_triangle,
-        uint32_t                  a,
-        uint32_t                  b,
-        uint32_t                  c
-    );
-
-/**
  * @brief Initialize the object group system
  */
 void object_group_init

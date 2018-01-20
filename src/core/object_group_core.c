@@ -22,13 +22,6 @@
                             LITERAL CONSTANTS
 **********************************************************************/
 
-#define VERTEX_ATTRIB_POINTER   0
-#define UV_ATTRIB_POINTER       1
-#define NORMAL_ATTRIB_POINTER   2
-#define BONE_ATTRIB_POINTER     3
-
-#define TEXTURE_UNIFORM_NAME    "image"
-
 /**********************************************************************
                                TYPES
 **********************************************************************/
@@ -85,7 +78,7 @@ static void object_group_frame_cb
     );
 
 /**
- *@brief Object group system event callback
+ * @brief Object group system event callback
  */
 static void object_group_system_cb
     (
@@ -106,19 +99,6 @@ void uv_set
 {
     uv->u = u;
     uv->v = v;
-}
-
-void vertex_triangle_set
-    (
-        vertex_triangle_type    * vertex_triangle,
-        uint32_t                  a,
-        uint32_t                  b,
-        uint32_t                  c
-    )
-{
-    vertex_triangle->a = a;
-    vertex_triangle->b = b;
-    vertex_triangle->c = c;
 }
 
 void object_group_init
@@ -143,17 +123,14 @@ void object_group_init
 {
     object_group_type * object_group;
     boolean             status;
-    vector_type*        vertex_shader_code;
-    vector_type*        fragment_shader_code;
 
     object_group = calloc( 1, sizeof( object_group_type ) );
 
-    object_group->is_3d                 = !params->is_2d;
-    object_group->use_uvs               = params->use_uvs;
     object_group->vertex_count          = params->vertex_count;
-    object_group->triangle_count        = params->triangle_count;
     object_group->object_cb             = params->object_cb;
     object_group->camera                = active_camera;
+    object_group->model_uniform_name    = params->model_uniform_name;
+    object_group->texture_valid         = params->texture_valid;
 
     /* Init the array of object positions */
     object_group->objects = vector_init( sizeof( object_type* ) );
@@ -164,46 +141,12 @@ void object_group_init
     /* Add the object to the list of active groups */
     vector_push_back( active_object_groups.active_object_groups, &object_group );
 
-    /* Build the shader to use */
-    vertex_shader_code = vector_init(sizeof(sint8_t));
-    fragment_shader_code = vector_init(sizeof(sint8_t));
+    /* Copy the shader to use */
+    memcpy( &( object_group->shader ), &( params->shader ), sizeof( shader_type ) );
 
-    status = file_read( params->vertex_shader_filename, vertex_shader_code );
-    if( !status )
-    {
-        return NULL;
-    }
-    status = file_read( params->fragment_shader_filename, fragment_shader_code );
-    if( !status )
-    {
-        return NULL;
-    }
-
-    status = shader_build( &object_group->shader, vector_access( vertex_shader_code, 0, sint8_t ), vector_access( fragment_shader_code, 0, sint8_t )  );
-    if( !status )
-    {
-        return NULL;
-    }
-
-    vector_deinit( vertex_shader_code );
-    vector_deinit( fragment_shader_code );
-
-    /* Build texture if required */
-    if( params->use_uvs )
-    {
-        status = texture_init
-        (
-            &object_group->texture,
-            params->texture_filename,
-            params->texture_slot,
-            &object_group->shader,
-            TEXTURE_UNIFORM_NAME
-        );
-        if( !status )
-        {
-            return NULL;
-        }
-    }
+    /* Copy texture to use */
+    memcpy( &( object_group->texture ), &( params->texture ), sizeof( texture_type ) );
+    object_group->texture.shader = &( object_group->shader );
 
     /* Do openGL specific init */
     status = openGL_init
@@ -211,6 +154,7 @@ void object_group_init
             object_group,
             params
         );
+
     if( !status )
     {
         return NULL;
@@ -251,9 +195,13 @@ void object_group_deinit
         void
     )
 {
-    while( vector_size( active_object_groups.active_object_groups ) > 0 )
+    uint32_t i;
+    uint32_t len;
+
+    len = vector_size( active_object_groups.active_object_groups );
+    for( i = 0; i < len; ++i )
     {
-        object_group_delete( *vector_access(active_object_groups.active_object_groups, 0, object_group_type* ) );
+        object_group_delete( *vector_access( active_object_groups.active_object_groups, i, object_group_type* ) );
     }
 
     vector_deinit( active_object_groups.active_object_groups );
@@ -266,57 +214,51 @@ static boolean openGL_init
     )
 {
     GLuint              vertex_buffer_object;
-    GLuint              element_buffer_object;
     GLuint              uv_buffer_object;
     GLuint              normal_buffer_object;
-    GLuint              bone_buffer_object;
 
-    /* Assign the vertexes to the object group */
+    /* Allocate data buffers. */ 
     glGenVertexArrays( 1, &object_group->vertex_array_object );
     glGenBuffers( 1, &vertex_buffer_object );
-    glGenBuffers( 1, &element_buffer_object );
     glGenBuffers( 1, &uv_buffer_object );
     glGenBuffers( 1, &normal_buffer_object );
-    glGenBuffers( 1, &bone_buffer_object );
+
+    /* Push data buffers onto the group, so they can be cleared later. */
     vector_push_back( object_group->buffers_to_delete, &vertex_buffer_object );
-    vector_push_back( object_group->buffers_to_delete, &element_buffer_object );
     vector_push_back( object_group->buffers_to_delete, &uv_buffer_object );
     vector_push_back( object_group->buffers_to_delete, &normal_buffer_object );
-    vector_push_back( object_group->buffers_to_delete, &bone_buffer_object );
 
+    /* Set the vertex array active. */
     glBindVertexArray( object_group->vertex_array_object );
 
-    glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer_object );
-    glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( vec3_type ), params->vertices, GL_STATIC_DRAW );
+    /* Assign channel data. */
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, element_buffer_object );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, params->triangle_count * sizeof( vertex_triangle_type ), params->triangles, GL_STATIC_DRAW );
-
-    glVertexAttribPointer( VERTEX_ATTRIB_POINTER, 3, GL_FLOAT, GL_FALSE, 0, NULL );
-    glEnableVertexAttribArray( VERTEX_ATTRIB_POINTER );
-
-    if( params->use_uvs )
+    if( NULL != params->vertices )
     {
-        glBindBuffer( GL_ARRAY_BUFFER, uv_buffer_object );
-        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( uv_type ), params->uvs, GL_STATIC_DRAW );
-        glVertexAttribPointer( UV_ATTRIB_POINTER, 2, GL_FLOAT, GL_FALSE, 0, NULL );
-        glEnableVertexAttribArray( UV_ATTRIB_POINTER );
+        glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer_object );
+        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( vertex_type ), params->vertices, GL_STATIC_DRAW );
+        glVertexAttribPointer( params->vertex_channel, 3, GL_FLOAT, GL_FALSE, 0, NULL );
+        glEnableVertexAttribArray( params->vertex_channel );
+    }
+    else
+    {
+        return FALSE;
     }
 
-    if( params->use_normals )
+    if( params->normals )
     {
         glBindBuffer( GL_ARRAY_BUFFER, normal_buffer_object );
         glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( vec3_type ), params->normals, GL_STATIC_DRAW );
-        glVertexAttribPointer( NORMAL_ATTRIB_POINTER, 3, GL_FLOAT, GL_FALSE, 0, NULL );
-        glEnableVertexAttribArray( NORMAL_ATTRIB_POINTER );
+        glVertexAttribPointer( params->normal_channel, 3, GL_FLOAT, GL_FALSE, 0, NULL );
+        glEnableVertexAttribArray( params->normal_channel );
     }
 
-    if( params->bone_association_size > 0 )
+    if( params->uvs )
     {
-        glBindBuffer( GL_ARRAY_BUFFER, bone_buffer_object );
-        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * params->bone_association_size * sizeof( GLfloat ), vector_access( params->bone_associations, 0, uint8_t ), GL_STATIC_DRAW );
-        glVertexAttribPointer( BONE_ATTRIB_POINTER, params->bone_association_size, GL_FLOAT, GL_FALSE, 0, NULL );
-        glEnableVertexAttribArray( BONE_ATTRIB_POINTER );
+        glBindBuffer( GL_ARRAY_BUFFER, uv_buffer_object );
+        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( uv_type ), params->uvs, GL_STATIC_DRAW );
+        glVertexAttribPointer( params->uv_channel, 2, GL_FLOAT, GL_FALSE, 0, NULL );
+        glEnableVertexAttribArray( params->uv_channel );
     }
 
     glBindVertexArray( 0 );
@@ -381,7 +323,7 @@ static void object_group_frame_cb
     
     shader_use( &( object_group->shader ) );
 
-    if ( object_group->use_uvs )
+    if ( object_group->texture_valid )
     {
         texture_use( &( object_group->texture ) );
     }
@@ -416,12 +358,11 @@ static void object_group_frame_cb
 
         if( object->is_visible )
         {
-            if(object_group->is_3d )
+            if( object_group->model_uniform_name )
             {
-                shader_set_uniform_mat4( object->shader, "model_matrix", &object->model_matrix );
+                shader_set_uniform_mat4( object->shader, object_group->model_uniform_name, &object->model_matrix );
             }
-            
-            glDrawElements( GL_TRIANGLES, object_group->triangle_count * sizeof( vertex_triangle_type ) / sizeof( GLuint ), GL_UNSIGNED_INT, 0 );
+            glDrawArrays( GL_TRIANGLES, 0, object_group->vertex_count );
         }
     }
 

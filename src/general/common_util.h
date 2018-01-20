@@ -28,5 +28,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
+#define array_count( a )  ( sizeof( a ) / sizeof( ( a )[0] ) )
+
 
 #endif /* COMMON_UTIL_H */
