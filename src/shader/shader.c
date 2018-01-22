@@ -42,7 +42,7 @@ static boolean shader_compile
     (
         sint8_t const * shader_code,
         shader_type_t   shader_type,
-        GLuint        * shader_handle   /* [out] Handle to the shader */
+        GLuint*         shader_handle   /* [out] Handle to the shader */
     );
 
 /**
@@ -55,9 +55,9 @@ static boolean shader_compile
  */
 static boolean shader_link
     (
-        GLuint          vertex_shader_handle,
-        GLuint          fragment_shader_handle,
-        GLuint        * program_handle
+        GLuint  vertex_shader_handle,
+        GLuint  fragment_shader_handle,
+        GLuint* program_handle
     );
 
 /**
@@ -80,23 +80,25 @@ static void print_program_error_log
                                 FUNCTIONS
 **********************************************************************/
 
-boolean shader_build
+shader_type* shader_build
     (
-        shader_type     * p_shader,
-        sint8_t const   * vertex_shader_code,
-        sint8_t const   * fragment_shader_code
+        sint8_t const * vertex_shader_code,
+        sint8_t const * fragment_shader_code
     )
 {
-    GLuint      vertex_shader_handle;
-    GLuint      fragment_shader_handle;
-    boolean     status;
+    GLuint       vertex_shader_handle;
+    GLuint       fragment_shader_handle;
+    boolean      status;
+    shader_type* shader;
+
+    shader = calloc( 1, sizeof( shader_type ) );
 
     /* Compile vertex shader */
     status = shader_compile( vertex_shader_code, SHADER_TYPE_VERTEX, &vertex_shader_handle );
 
     if( !status )
     {
-        return FALSE;
+        return NULL;
     }
 
     /* Compile fragment shader */
@@ -104,26 +106,26 @@ boolean shader_build
 
     if( !status )
     {
-        return FALSE;
+        return NULL;
     }
 
     /* Link the program */
-    status = shader_link( vertex_shader_handle, fragment_shader_handle, &p_shader->program_id );
+    status = shader_link( vertex_shader_handle, fragment_shader_handle, &shader->program_id );
 
     if( !status )
     {
-        return FALSE;
+        return NULL;
     }
 
-    return TRUE;
+    return shader;
 }
 
 void shader_use
     (
-        shader_type     * p_shader
+        shader_type* shader
     )
 {
-    glUseProgram( p_shader->program_id );
+    glUseProgram( shader->program_id );
 }
 
 
@@ -137,35 +139,36 @@ void shader_clear
 
 void shader_free
     (
-        shader_type     * p_shader
+        shader_type* shader
     )
 {
-    glDeleteProgram( p_shader->program_id );
+    glDeleteProgram( shader->program_id );
+    free( shader );
 }
 
 void shader_set_uniform_mat4
     (
-        shader_type const * p_shader,
+        shader_type const * shader,
         sint8_t     const * uniform_name,
         mat4_type   const * mat4
     )
 {
     GLuint uniform_location;
 
-    uniform_location = glGetUniformLocation( p_shader->program_id, uniform_name );
+    uniform_location = glGetUniformLocation( shader->program_id, uniform_name );
     glUniformMatrix4fv( uniform_location, 1, GL_FALSE, &mat4->x.x );
 }
 
 void shader_set_uniform_uint32
     (
-        shader_type const * p_shader,
+        shader_type const * shader,
         sint8_t     const * uniform_name,
         uint32_t            uint32
     )
 {
     GLuint uniform_location;
 
-    uniform_location = glGetUniformLocation( p_shader->program_id, uniform_name );
+    uniform_location = glGetUniformLocation( shader->program_id, uniform_name );
     glUniform1i( uniform_location, uint32 );
 }
 

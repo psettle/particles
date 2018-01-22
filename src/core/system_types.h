@@ -157,18 +157,16 @@ typedef void (*object_cb_type)
  */
 typedef struct object_group_struct
 {
-    uint32_t          next_id;
-    GLuint            vertex_array_object;
-    camera_type     * camera;
-    shader_type       shader;
+    uint32_t        next_id;
+    GLuint          vertex_array_object;
+    camera_type   * camera;
+    shader_type   * shader;
     sint8_t const *   model_uniform_name;
-    texture_type      texture;
-    boolean           texture_valid;
-    vector_type     * objects; /* Array of object_type* representing each unique object in the group */
-    uint32_t          vertex_count;
-    vector_type     * buffers_to_delete; /* GLuint Random buffers that must be deleted when the object goes out of scope */
-
-    object_cb_type    object_cb;
+    texture_type  * texture;
+    vector_type   * objects; /* Array of object_type* representing each unique object in the group */
+    uint32_t        vertex_count;
+    vector_type   * buffers_to_delete; /* GLuint Random buffers that must be deleted when the object goes out of scope */
+    object_cb_type  object_cb;
 } object_group_type;
 
 /**
@@ -176,18 +174,17 @@ typedef struct object_group_struct
  */
 typedef struct object_group_create_argument_struct
 {
-    shader_type                    shader;       /* A shader object (@see shader.h), will be automatically deleted when the object group goes out of scope. */  
-    sint8_t const *                model_uniform_name; /* (Optional) A model uniform name to automatically set objects model matrix each frame. */
-    vec3_type*                     vertices;     /* A pointer to all vertices for the model, count is vertex_count  */
-    uint8_t                        vertex_channel;
-    vec3_type*                     normals;
-    uint8_t                        normal_channel;
-    uv_type*                       uvs;
-    uint8_t                        uv_channel;
-    uint32_t                       vertex_count;
-    texture_type                   texture;      /* A texture object (@see texture.h), will be automatically deleted when the object group goes out of scope.  */
-    boolean                        texture_valid;
-    object_cb_type                 object_cb;    /* Will be called on every frame for each instance of this object type. @see object_event_type_t8 */
+    shader_type*    shader;       /* A shader object (@see shader.h), will be automatically deleted when the object group goes out of scope. */  
+    sint8_t const * model_uniform_name; /* (Optional) A model uniform name to automatically set objects model matrix each frame. */
+    vec3_type*      vertices;     /* A pointer to all vertices for the model, count is vertex_count  */
+    uint8_t         vertex_channel;
+    vec3_type*      normals;
+    uint8_t         normal_channel;
+    uv_type*        uvs;
+    uint8_t         uv_channel;
+    uint32_t        vertex_count;
+    texture_type*   texture;      /* A texture object (@see texture.h), will be automatically deleted when the object group goes out of scope.  */
+    object_cb_type  object_cb;    /* Will be called on every frame for each instance of this object type. @see object_event_type_t8 */
 } object_group_create_argument_type;
 
 

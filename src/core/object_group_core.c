@@ -13,10 +13,7 @@
 #include "texture.h"
 #include "camera.h"
 #include "common_util.h"
-#include "file_api.h"
 #include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 /**********************************************************************
                             LITERAL CONSTANTS
@@ -36,7 +33,7 @@ typedef struct active_object_group_struct
 **********************************************************************/
 
 static active_object_group_type active_object_groups;
-static camera_type*                active_camera;
+static camera_type*             active_camera;
 
 /**********************************************************************
                              PROTOTYPES
@@ -130,7 +127,6 @@ void object_group_init
     object_group->object_cb             = params->object_cb;
     object_group->camera                = active_camera;
     object_group->model_uniform_name    = params->model_uniform_name;
-    object_group->texture_valid         = params->texture_valid;
 
     /* Init the array of object positions */
     object_group->objects = vector_init( sizeof( object_type* ) );
@@ -142,11 +138,10 @@ void object_group_init
     vector_push_back( active_object_groups.active_object_groups, &object_group );
 
     /* Copy the shader to use */
-    memcpy( &( object_group->shader ), &( params->shader ), sizeof( shader_type ) );
+    object_group->shader = params->shader;
 
     /* Copy texture to use */
-    memcpy( &( object_group->texture ), &( params->texture ), sizeof( texture_type ) );
-    object_group->texture.shader = &( object_group->shader );
+    object_group->texture = params->texture;
 
     /* Do openGL specific init */
     status = openGL_init
@@ -185,8 +180,8 @@ void object_group_delete
     vector_remove( active_object_groups.active_object_groups, &object_group );
     vector_deinit( object_group->objects );
     vector_deinit( object_group->buffers_to_delete );
-    texture_free( &object_group->texture );
-    shader_free( &object_group->shader );
+    texture_free( object_group->texture );
+    shader_free( object_group->shader );
     free( object_group );
 }
 
@@ -321,14 +316,14 @@ static void object_group_frame_cb
     uint16_t len;
     object_event_type object_event;
     
-    shader_use( &( object_group->shader ) );
+    shader_use( object_group->shader );
 
-    if ( object_group->texture_valid )
+    if ( NULL != object_group->texture )
     {
-        texture_use( &( object_group->texture ) );
+        texture_use( object_group->texture );
     }
     
-    camera_set_active( object_group->camera, &( object_group->shader ) );
+    camera_set_active( object_group->camera, object_group->shader );
     
     len = vector_size( object_group->objects );
 
@@ -337,7 +332,7 @@ static void object_group_frame_cb
     if( NULL != object_group->object_cb )
     {
         object_event.event_type = OBJECT_EVENT_TYPE_RENDER_START;
-        object_event.event_data.render_start_data.shader = &( object_group->shader );
+        object_event.event_data.render_start_data.shader = object_group->shader;
         object_group->object_cb( &object_event );
 
         object_event.event_type = OBJECT_EVENT_TYPE_RENDER_OBJECT;

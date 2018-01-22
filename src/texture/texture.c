@@ -10,24 +10,26 @@
 #include "texture.h"
 #include "common_util.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /**********************************************************************
                                 FUNCTION
 **********************************************************************/
 
-boolean texture_init
+texture_type* texture_init
     (
-        texture_type  * texture,
         sint8_t const * image_filename,
         GLuint          slot,
         shader_type   * shader,
         sint8_t const * uniform_name
     )
 {
-    GLint       width;
-    GLint       height;
-    uint8_t   * image;
+    texture_type* texture;
+    GLint         width;
+    GLint         height;
+    uint8_t*      image;
 
+    texture = calloc( 1, sizeof( texture_type ) );
     texture->slot = slot;
     texture->shader = shader;
     texture->uniform_name = uniform_name;
@@ -36,8 +38,7 @@ boolean texture_init
     image = SOIL_load_image( image_filename, &width, &height, 0, SOIL_LOAD_RGBA);
     if( !image )
     {
-        DEBUG_LINE();
-        return FALSE;
+        return NULL;
     }
 
     /* generate and bind a texture */
@@ -59,7 +60,7 @@ boolean texture_init
     /* clear the bound texture */
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    return TRUE;
+    return texture;
 }
 
 void texture_use
@@ -87,4 +88,5 @@ void texture_free
     )
 {
     glDeleteTextures( 1, &texture->texture_id );
+    free( texture );
 }

@@ -38,12 +38,11 @@ typedef struct shader_struct
  * @brief Build a shader from a vertex and shader .glsl file
  *
  * @return
- *      TRUE on success
- *      FALSE if an error occurs
+ *      Shader object on success
+ *      NULL on error
  */
-boolean shader_build
+shader_type* shader_build
     (
-        shader_type     * p_shader,
         sint8_t const   * vertex_shader_code,
         sint8_t const   * fragment_shader_code
     );
@@ -53,7 +52,7 @@ boolean shader_build
  */
 void shader_use
     (
-        shader_type     * p_shader
+        shader_type* shader
     );
 
 /**
@@ -69,7 +68,7 @@ void shader_clear
  */
 void shader_free
     (
-        shader_type     * p_shader
+        shader_type* shader
     );
 
 /**
@@ -77,7 +76,7 @@ void shader_free
  */
 void shader_set_uniform_mat4
     (
-        shader_type const * p_shader,
+        shader_type const * shader,
         sint8_t     const * uniform_name,
         mat4_type   const * mat4
     );
@@ -87,7 +86,7 @@ void shader_set_uniform_mat4
  */
 void shader_set_uniform_uint32
     (
-        shader_type const * p_shader,
+        shader_type const * shader,
         sint8_t     const * uniform_name,
         uint32_t            uint32
     );

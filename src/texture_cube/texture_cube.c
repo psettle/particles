@@ -26,11 +26,17 @@
                              PROTOTYPES
 **********************************************************************/
 
+/**
+ * @brief Create and assign a system camera.
+ */ 
 static void create_camera
     (
     void
     );
 
+/**
+ * @brief Callback for object events, this is where objects can be moved/updated.
+ */ 
 static void texture_cube_object_cb
     (
     object_event_type const * event_data
@@ -40,7 +46,10 @@ static void texture_cube_object_cb
                              VARIABLES
 **********************************************************************/
 
-GLfloat vertices_raw[] = {
+/**
+ * @brief Every vertex on the cube, each set of 3 is a triangle.
+ */ 
+static GLfloat const vertices_raw[] = {
     0.5f,  0.5f,  0.5f,
     0.5f, -0.5f,  0.5f,
    -0.5f,  0.5f,  0.5f,
@@ -90,7 +99,10 @@ GLfloat vertices_raw[] = {
    -0.5f, -0.5f, -0.5f,
 };
 
-GLfloat uvs_raw[] = {
+/**
+ * @brief Texture coordinates for each vertex.
+ */
+static GLfloat const uvs_raw[] = {
     1.0f,  0.0f,
     1.0f,  1.0f,
     0.0f,  0.0f,
@@ -138,22 +150,6 @@ GLfloat uvs_raw[] = {
     1.0f,  1.0f,
     1.0f,  1.0f,
     0.0f,  1.0f,
-};
-
-object_group_create_argument_type texture_cube =
-{
-    { 0 }, /* Shader, needs init */
-    "model_matrix",
-    (vec3_type*)vertices_raw,
-    0,
-    NULL,
-    0,
-    (uv_type*)uvs_raw,
-    1,
-    ( sizeof( vertices_raw ) / sizeof( vec3_type ) ), /* .vertex_count */
-    { 0 }, /* Texture, needs init */
-    TRUE,
-    texture_cube_object_cb
 };
 
 static object_group_type* texture_cube_group;
@@ -169,9 +165,11 @@ void texture_cube_start
     )
 {
     object_type* cube;
-    vec3_type amount;
-    vector_type*        vertex_shader_code;
-    vector_type*        fragment_shader_code;
+    vec3_type    amount;
+    vector_type* vertex_shader_code;
+    vector_type* fragment_shader_code;
+
+    object_group_create_argument_type texture_cube;
 
     create_camera();
      
@@ -181,17 +179,30 @@ void texture_cube_start
     file_read( "shaders/vertex_shader_3d_uv_no_light.glsl", vertex_shader_code );
     file_read( "shaders/fragment_shader_3d_uv_no_light.glsl", fragment_shader_code );
 
-    shader_build( &( texture_cube.shader ), vector_access( vertex_shader_code, 0, sint8_t ), vector_access( fragment_shader_code, 0, sint8_t )  );
+    texture_cube.shader = shader_build
+    ( 
+        vector_access( vertex_shader_code, 0, sint8_t ),
+        vector_access( fragment_shader_code, 0, sint8_t )
+    );
 
     vector_deinit( vertex_shader_code );
     vector_deinit( fragment_shader_code );
 
-    texture_init
+    texture_cube.model_uniform_name = "model_matrix";
+    texture_cube.vertices = (vec3_type*)vertices_raw;
+    texture_cube.vertex_channel = 0;
+    texture_cube.normals = NULL;
+    texture_cube.normal_channel = 0; /* Doesn't matter, no normals provided. */
+    texture_cube.uvs = (uv_type*)uvs_raw;
+    texture_cube.uv_channel = 1;
+    texture_cube.vertex_count = sizeof( vertices_raw ) / sizeof( vec3_type );
+    texture_cube.object_cb = texture_cube_object_cb;
+
+    texture_cube.texture = texture_init
     (
-        &( texture_cube.texture ),
-        "images/test.jpg",
+        "images/qbd.png",
         GL_TEXTURE0,
-        &( texture_cube.shader ),
+        texture_cube.shader,
         "image"
     );
 
@@ -216,7 +227,7 @@ static void create_camera
     camera_init( &camera );
     camera_set_perspective( &camera, 110.0f * M_PI / 180.0f, 1920, 1080, 0.1f, 10.0f );
 
-    vec3_set( &from, 2.0f, 2.0f, -1.0f );
+    vec3_set( &from, 1.0f, 1.0f, 1.0f );
     vec3_set( &to, 0.0f, 0.0f, 0.0f );
     vec3_set( &up, 0.0f, 1.0f, 0.0f );
 
@@ -229,13 +240,13 @@ static void texture_cube_object_cb
     )
 {
     vec3_type axis;
-    vec3_set( &axis, 0.5, 0.5, 0.5 );
 
     switch( event_data->event_type )
     {
     case OBJECT_EVENT_TYPE_RENDER_START:
         break;
     case OBJECT_EVENT_TYPE_RENDER_OBJECT:
+        vec3_set( &axis, 0.5, 0.5, 0.5 );
         object_rotate( event_data->event_data.render_object_data.object, &axis, event_data->event_data.render_object_data.time_since_last_frame );
         break;
     default:

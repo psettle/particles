@@ -209,7 +209,6 @@ static boolean model_load_format_stl
 {
     vector_type*    file_contents;
     uint32_t        len;
-    sint8_t const * file_contents_str;
     boolean         ret;
 
     file_contents = vector_init( sizeof( sint8_t ) );

@@ -44,7 +44,7 @@ object_type * object_create
     vec3_set( &object->position, VEC3_NULL );
     mat4_set( &object->model_matrix, MAT4_IDENTITY );
     object->bones = vector_init( sizeof( bone_type ) );
-    object->shader = &( object_group->shader );
+    object->shader = object_group->shader;
 
     vector_push_back( object_group->objects, &object );
     return object;

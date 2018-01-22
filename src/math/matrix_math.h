@@ -197,6 +197,15 @@ void mat4_set
     );
 
 /**
+ * @brief out = in^-1
+ */
+void mat4_inverse
+    (
+        mat4_type*        out,
+        mat4_type const * in
+    );
+
+/**
  * @brief product = left * right
  */
 void mat4_multiply

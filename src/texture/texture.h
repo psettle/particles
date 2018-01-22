@@ -34,9 +34,8 @@ typedef struct texture_struct
 /**
  * @brief Initializes a new texture object
  */
-boolean texture_init
+texture_type* texture_init
     (
-        texture_type  * texture,
         sint8_t const * image_filename,
         GLuint          slot,
         shader_type   * shader,

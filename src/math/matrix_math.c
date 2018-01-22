@@ -173,6 +173,34 @@ void mat4_set
     vec4_set( &mat4->w, w_x, w_y, w_z, w_w );
 }
 
+void mat4_inverse
+    (
+        mat4_type*        out,
+        mat4_type const * in
+    )
+{
+    mat4_type in_copy;
+
+    /* copy in case in == out */
+    memcpy( &in_copy, in, sizeof( mat4_type ) );
+
+    out->x.y = in_copy.y.x;
+    out->x.z = in_copy.z.x;
+    out->x.w = in_copy.w.x;
+
+    out->y.x = in_copy.x.y;
+    out->y.z = in_copy.z.y;
+    out->y.w = in_copy.w.y;
+
+    out->z.x = in_copy.x.z;
+    out->z.y = in_copy.y.z;
+    out->z.w = in_copy.w.z;
+
+    out->w.x = in_copy.x.w;
+    out->w.y = in_copy.y.w;
+    out->w.z = in_copy.z.w;
+}
+
 void mat4_multiply
     (
         mat4_type*        product,
@@ -181,11 +209,13 @@ void mat4_multiply
     )
 {
     mat4_type right_copy;
+
     vec4_type row_x;
     vec4_type row_y;
     vec4_type row_z;
     vec4_type row_w;
 
+    /* Make copies incase left == product || right == product */
     memcpy( &right_copy, right, sizeof( mat4_type ) );
     vec4_set( &row_x, left->x.x, left->y.x, left->z.x, left->w.x );
     vec4_set( &row_y, left->x.y, left->y.y, left->z.y, left->w.y );
@@ -211,7 +241,6 @@ void mat4_multiply
     product->w.y = vec4_dot( &row_y, &right_copy.w );
     product->w.z = vec4_dot( &row_z, &right_copy.w );
     product->w.w = vec4_dot( &row_w, &right_copy.w );
-    return;
 }
 
 void mat4_look_at
