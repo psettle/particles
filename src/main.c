@@ -8,6 +8,7 @@
 
 #include    "system.h"
 #include    "texture_cube.h"
+#include    "model_loader.h"
 
 int main()
 {
@@ -16,6 +17,6 @@ int main()
         texture_cube_start();
         system_run();
     }
-
+    
     return 0;
 }

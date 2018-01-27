@@ -34,13 +34,13 @@ static void resize
 
 /**
  * @brief Shifts the elements of the array, either deleting
- * them from the from of opening up new slots at the front
+ * them from the front or opening up new slots at the front
  */
 static void shift_items
     (
         vector_type   * vector,
         uint32_t        amount_of_shift,
-        boolean         direction /* TRUE for forward */
+        boolean         direction /* TRUE to open up empty spaces at index 0+ */
     );
 
 /**********************************************************************

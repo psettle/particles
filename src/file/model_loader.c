@@ -24,8 +24,8 @@
 
 typedef boolean (*model_load_cb)
     (
-        sint8_t const *      file_name,
-        vector_type*         vertices       /* out: vertex_type */
+        sint8_t const *           file_name,
+        model_load_data_out_type* model_load_data_out
     );
 
 typedef struct model_load_associations_struct
@@ -60,26 +60,26 @@ STL_ASCII_STATE_FOOTER
 
 static boolean model_load_format_auto
     (
-        sint8_t const *      file_name,
-        vector_type*         vertices       /* out: vertex_type */
+        sint8_t const *           file_name,
+        model_load_data_out_type* model_load_data_out
     );
 
 static boolean model_load_format_stl
     (
-        sint8_t const *      file_name,
-        vector_type*         vertices       /* out: vertex_type */
+        sint8_t const *           file_name,
+        model_load_data_out_type* model_load_data_out
     );
 
 static boolean model_load_format_stl_ascii
     (
-        vector_type*         file_contents, /* in: sint8_t */
-        vector_type*         vertices       /* out: vertex_type */
+        vector_type*              file_contents, /* in: sint8_t */
+        model_load_data_out_type* model_load_data_out
     );
 
 static boolean model_load_format_stl_binary
     (
-        vector_type*         file_contents, /* in: sint8_t */
-        vector_type*         vertices       /* out: vertex_type */
+        vector_type*              file_contents, /* in: sint8_t */
+        model_load_data_out_type* model_load_data_out
     );
 
 static void ascii_token_parse_tokens
@@ -128,17 +128,17 @@ static model_load_associations_type const file_extensions[] =
 
 boolean model_load
     (
-        model_file_format_t8 file_format,
-        sint8_t const *      file_name,
-        vector_type*         vertices       /* out: vertex_type */
+        model_file_format_t8      file_format,
+        sint8_t const *           file_name,
+        model_load_data_out_type* model_load_data_out
     )
 {
     switch( file_format )
     {
     case MODEL_FILE_FORMAT_AUTO:
-        return model_load_format_auto( file_name, vertices );
+        return model_load_format_auto( file_name, model_load_data_out );
     case MODEL_FILE_FORMAT_STL:
-        return model_load_format_stl( file_name, vertices );
+        return model_load_format_stl( file_name, model_load_data_out );
     default:
         DEBUG_LINE();
         return FALSE;
@@ -147,8 +147,8 @@ boolean model_load
 
 static boolean model_load_format_auto
     (
-        sint8_t const *      file_name,
-        vector_type*         vertices       /* out: vertex_type */
+        sint8_t const *           file_name,
+        model_load_data_out_type* model_load_data_out
     )
 {
     sint8_t const * file_extension;
@@ -192,7 +192,7 @@ static boolean model_load_format_auto
 
         if( 0 == memcmp( file_extension, file_extensions[i].file_extension, len ) )
         {
-            return file_extensions[i].loader_function( file_name, vertices );
+            return file_extensions[i].loader_function( file_name, model_load_data_out );
         }
     }
 
@@ -203,8 +203,8 @@ static boolean model_load_format_auto
 
 static boolean model_load_format_stl
     (
-        sint8_t const *      file_name,
-        vector_type*         vertices       /* out: vertex_type */
+        sint8_t const *           file_name,
+        model_load_data_out_type* model_load_data_out
     )
 {
     vector_type*    file_contents;
@@ -229,11 +229,11 @@ static boolean model_load_format_stl
 
     if( 0 == memcmp( vector_access(  file_contents, 0, sint8_t ), "solid", 5 ) )
     {
-        ret = model_load_format_stl_ascii( file_contents, vertices );
+        ret = model_load_format_stl_ascii( file_contents, model_load_data_out );
     }
     else
     {
-        ret = model_load_format_stl_binary( file_contents, vertices );
+        ret = model_load_format_stl_binary( file_contents, model_load_data_out );
     }
 
     vector_deinit( file_contents );
@@ -242,8 +242,8 @@ static boolean model_load_format_stl
 
 static boolean model_load_format_stl_ascii
     (
-        vector_type*         file_contents, /* in: sint8_t */
-        vector_type*         vertices       /* out: vertex_type */
+        vector_type*              file_contents, /* in: sint8_t */
+        model_load_data_out_type* model_load_data_out
     )
 {
     stl_ascii_state_t8  stl_ascii_state;
@@ -254,9 +254,16 @@ static boolean model_load_format_stl_ascii
     sint8_t const *     y;
     sint8_t const *     z;
     
+    vector_type*        vertices;
+    vector_type*        normals;
+
     vec3_type           active_normal;
     vec3_type           active_vertex;
-    vertex_type         vertex_out;
+
+    /* Init output vectors */
+    memset( model_load_data_out, 0, sizeof( model_load_data_out_type ) );
+    vertices = vector_init( sizeof( vec3_type ) );
+    normals  = vector_init( sizeof( vec3_type ) );
 
     /* Init token obj */
     tokens = ascii_token_init();
@@ -303,11 +310,8 @@ static boolean model_load_format_stl_ascii
 
                 vec3_set( &active_vertex, atof( x ), atof( y ), atof( z ) );
 
-                memset( &vertex_out, 0, sizeof( vertex_out ) );
-                
-                vec3_cpy( &( vertex_out.normal ), &active_normal );
-                vec3_cpy( &( vertex_out.vertex ), &active_vertex );
-                vector_push_back( vertices, &vertex_out );
+                vector_push_back( vertices, &active_vertex );
+                vector_push_back( normals, &active_normal );
 
                 stl_ascii_state = STL_ASCII_STATE_UNKNOWN;
                 break;
@@ -330,13 +334,32 @@ static boolean model_load_format_stl_ascii
 
     /* Deinit token resources */
     ascii_token_deinit( tokens );
+
+    /* Assert vertices == normals */
+    if( vector_size( vertices ) != vector_size( normals ) )
+    {
+        ASSERT_ALWAYS();
+    }
+
+    /* Assign or clean up output */
+    if( vector_size( vertices ) > 0 )
+    {
+        model_load_data_out->vertices = vertices;
+        model_load_data_out->normals = normals;
+    }
+    else
+    {
+        vector_deinit( vertices );
+        vector_deinit( normals );
+    }
+
     return TRUE;
 }
 
 static boolean model_load_format_stl_binary
     (
-        vector_type*         file_contents, /* in: sint8_t */
-        vector_type*         vertices       /* out: vertex_type */
+        vector_type*              file_contents, /* in: sint8_t */
+        model_load_data_out_type* model_load_data_out
     )
 {
     /* not implemented */
@@ -409,6 +432,7 @@ static boolean is_whitespace
     case '\r':
     case '\t':
     case ' ':
+    case '\0':
         return TRUE;
     default:
         return FALSE;
@@ -462,6 +486,10 @@ static stl_ascii_state_t8 stl_ascii_identify_next_line
         sint8_t const * token
     )
 {
+    if( !strcmp( token, "solid") )
+    {
+        return STL_ASCII_STATE_HEADER;
+    }
     if( !strcmp( token, "build" ) )
     {
         return STL_ASCII_STATE_HEADER;
@@ -485,7 +513,8 @@ static stl_ascii_state_t8 stl_ascii_identify_next_line
     }
     if( !strcmp( token, "endfacet" ) )
     {
-        return STL_ASCII_STATE_FACET_FOOTER;
+        /* There are no other tokens for facet, so continue with unknown */
+        return STL_ASCII_STATE_UNKNOWN;
     }
     if( !strcmp( token, "endsolid" ) )
     {

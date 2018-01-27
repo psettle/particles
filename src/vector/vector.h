@@ -16,7 +16,7 @@
                                 TYPES
 **********************************************************************/
 
-/* Vector type, should only be accessed with interface functiosn below */
+/* Vector type, should only be accessed with interface functions below */
 typedef struct vector_struct
 {
     uint8_t       * list_items;
@@ -115,7 +115,7 @@ void vector_pop_back
     );
 
 /**
- * @brief Accessed an element from the vector
+ * @brief Access an element from the vector
  *
  * @return A pointer to the internal memory that holds the element
  * (Any vector function may reallocate this memory, so the pointer should be fetched every use)

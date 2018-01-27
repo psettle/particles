@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "common_util.h": "c",
+        "model_loader.h": "c",
+        "object_group_core.h": "c",
+        "texture_cube.h": "c",
+        "system_types.h": "c"
+    }
+}

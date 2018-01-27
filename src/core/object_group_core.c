@@ -231,7 +231,7 @@ static boolean openGL_init
     if( NULL != params->vertices )
     {
         glBindBuffer( GL_ARRAY_BUFFER, vertex_buffer_object );
-        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( vertex_type ), params->vertices, GL_STATIC_DRAW );
+        glBufferData( GL_ARRAY_BUFFER, params->vertex_count * sizeof( vec3_type ), params->vertices, GL_STATIC_DRAW );
         glVertexAttribPointer( params->vertex_channel, 3, GL_FLOAT, GL_FALSE, 0, NULL );
         glEnableVertexAttribArray( params->vertex_channel );
     }

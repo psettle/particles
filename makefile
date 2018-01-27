@@ -1,7 +1,13 @@
+#config
+DEBUG=1
+APP_MK=src/example/texture_cube/texture_cube.mk
+
 #setup
 SOURCES=
 LIBS=
 INCLUDE=
+
+include $(APP_MK)
 
 #header includes
 INCLUDE += include
@@ -16,7 +22,6 @@ INCLUDE += src/math
 INCLUDE += src/core
 INCLUDE += src/vector
 INCLUDE += src/texture
-INCLUDE += src/texture_cube
 
 #source includes
 SOURCES += src/file/file_api.c
@@ -29,15 +34,11 @@ SOURCES += src/texture/texture.c
 SOURCES += src/math/matrix_math.c
 
 SOURCES += src/vector/vector.c
-SOURCES += src/vector/vector_test.c
-
 
 SOURCES += src/core/system.c
 SOURCES += src/core/object_group_core.c
 SOURCES += src/core/object.c
 SOURCES += src/core/camera.c
-
-SOURCES += src/texture_cube/texture_cube.c
 
 #lib includes
 LIBS += lib/libSOIL.a
@@ -52,9 +53,15 @@ EXECUTABLE=out/particles.exe
 EXECUTABLE_MAIN=src/main.c
 EXECUTABLE_MAIN_O=$(EXECUTABLE_MAIN:%.c=out/%.o)
 
-LDFLAGS=-Wall -m32 -ansi -pedantic -O3
+ifeq ($(DEBUG), 1)
+	FLAG_BUILD_MODE=-O0 -g
+else
+	FLAG_BUILD_MODE=-O3
+endif
+
+LDFLAGS=-Wall -m32 -ansi -pedantic $(FLAG_BUILD_MODE)
 CC=gcc
-CFLAGS=-c -Wall -MMD -m32 -ansi -pedantic -O3
+CFLAGS=-c -Wall -MMD -m32 -ansi -pedantic $(FLAG_BUILD_MODE)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_FINAL=$(OBJECTS:%.o=out/%.o)
 OBJECTS_FINAL_PLUS_MAIN=$(OBJECTS_FINAL)

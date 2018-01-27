@@ -161,7 +161,7 @@ typedef struct object_group_struct
     GLuint          vertex_array_object;
     camera_type   * camera;
     shader_type   * shader;
-    sint8_t const *   model_uniform_name;
+    sint8_t const * model_uniform_name;
     texture_type  * texture;
     vector_type   * objects; /* Array of object_type* representing each unique object in the group */
     uint32_t        vertex_count;

@@ -24,6 +24,24 @@
     #define DEBUG_LING()
 #endif
 
+#define ASSERT_ENABLE TRUE
+
+#if ASSERT_ENABLE
+    #define ASSERT( check )\
+    do {\
+        if( !( check ) )\
+        {\
+        DEBUG_LINE();\
+        exit( 1 );\
+        }\
+    } while( FALSE )
+#else
+    #define ASSERT( check )
+#endif
+
+#define ASSERT_ALWAYS() ASSERT( FALSE )
+
+
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
