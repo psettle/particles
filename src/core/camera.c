@@ -49,7 +49,7 @@ void camera_set_view
 
     /* Recalculate the position and projection view matrix */
     mat4_multiply( &( camera->projection_view_matrix ), &( camera->projection_matrix ), &( camera->view_matrix ) );
-    camera->position = *from;
+    vec3_cpy( &camera->position, from );
 }
 
 void camera_set_perspective
@@ -74,5 +74,5 @@ void camera_get_position
         vec3_type         * position
     )
 {
-    *position = camera->position;
+    vec3_cpy( position, &camera->position );
 }

@@ -145,6 +145,27 @@ boolean model_load
     }
 }
 
+void model_load_free_data
+    (
+    model_load_data_out_type* model_load_data_out
+    )
+{
+    if( NULL != model_load_data_out->vertices )
+    {
+        vector_deinit( model_load_data_out->vertices );
+    }
+
+    if( NULL != model_load_data_out->normals )
+    {
+        vector_deinit( model_load_data_out->normals );
+    }
+
+    if( NULL != model_load_data_out->uvs )
+    {
+        vector_deinit( model_load_data_out->uvs );
+    }
+}
+
 static boolean model_load_format_auto
     (
         sint8_t const *           file_name,

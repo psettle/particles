@@ -82,6 +82,26 @@ void shader_set_uniform_mat4
     );
 
 /**
+ * @brief Set the value of an vec3 uniform
+ */
+void shader_set_uniform_vec3
+    (
+        shader_type const * shader,
+        sint8_t     const * uniform_name,
+        vec3_type   const * vec3
+    );
+
+/**
+ * @brief Set the value of an float uniform
+ */
+void shader_set_uniform_float
+    (
+        shader_type const * shader,
+        sint8_t     const * uniform_name,
+        GLfloat             fl
+    );
+
+/**
  * @brief Set the value of an int uniform
  */
 void shader_set_uniform_uint32

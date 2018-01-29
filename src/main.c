@@ -7,14 +7,15 @@
 */
 
 #include    "system.h"
-#include    "texture_cube.h"
+#include    "bouncy_sphere.h"
 #include    "model_loader.h"
 
 int main()
 {
     if( system_init() )
     {
-        texture_cube_start();
+        /* texture_cube_start(); */
+        bouncy_sphere_start();
         system_run();
     }
     

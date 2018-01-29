@@ -159,6 +159,32 @@ void shader_set_uniform_mat4
     glUniformMatrix4fv( uniform_location, 1, GL_FALSE, &mat4->x.x );
 }
 
+void shader_set_uniform_vec3
+    (
+        shader_type const * shader,
+        sint8_t     const * uniform_name,
+        vec3_type   const * vec3
+    )
+{
+    GLuint uniform_location;
+    
+    uniform_location = glGetUniformLocation( shader->program_id, uniform_name );
+    glUniform3f( uniform_location, vec3->x, vec3->y, vec3->z );
+}
+
+void shader_set_uniform_float
+    (
+        shader_type const * shader,
+        sint8_t     const * uniform_name,
+        GLfloat             fl
+    )
+{
+    GLuint uniform_location;
+
+    uniform_location = glGetUniformLocation( shader->program_id, uniform_name );
+    glUniform1f( uniform_location, fl );
+}
+
 void shader_set_uniform_uint32
     (
         shader_type const * shader,

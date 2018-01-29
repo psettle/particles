@@ -180,7 +180,12 @@ void object_group_delete
     vector_remove( active_object_groups.active_object_groups, &object_group );
     vector_deinit( object_group->objects );
     vector_deinit( object_group->buffers_to_delete );
-    texture_free( object_group->texture );
+    
+    if( NULL != object_group->texture )
+    {
+        texture_free( object_group->texture );
+    }
+
     shader_free( object_group->shader );
     free( object_group );
 }

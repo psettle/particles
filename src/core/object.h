@@ -77,4 +77,13 @@ void object_set_position
         vec3_type const     * position
     );
 
+/**
+ * @brief Get position of object
+ */
+void object_get_position
+    (
+        object_type         * object,
+        vec3_type         * position
+    );
+
 #endif /* OBJECT_H */

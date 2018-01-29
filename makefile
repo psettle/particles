@@ -1,6 +1,6 @@
 #config
 DEBUG=1
-APP_MK=src/example/texture_cube/texture_cube.mk
+APP_MK=src/example/bouncy_sphere/bouncy_sphere.mk
 
 #setup
 SOURCES=

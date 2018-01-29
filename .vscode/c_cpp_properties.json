@@ -62,7 +62,9 @@
                 "${workspaceRoot}/src/vector",
                 "${workspaceRoot}/src/core",
                 "${workspaceRoot}/src/texture_cube",
-                "${workspaceRoot}/src/file"
+                "${workspaceRoot}/src/file",
+                "${workspaceRoot}/src/example/texture_cube",
+                "${workspaceRoot}/src/example/bouncy_sphere"
             ],
             "defines": [
                 "_DEBUG",

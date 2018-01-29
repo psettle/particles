@@ -124,6 +124,14 @@ void object_set_position
     object_translate( object, &neg_position ); 
 
     /* Translate to new position, if the new position isn't origin. */
-    object_translate( object, position );
-    
+    object_translate( object, position );   
+}
+
+void object_get_position
+    (
+        object_type         * object,
+        vec3_type         * position
+    )
+{
+    *position = object->position;
 }

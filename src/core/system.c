@@ -25,8 +25,8 @@
 #define WINDOW_WIDTH    1920
 #define WINDOW_HEIGHT   1080
 #else
-#define WINDOW_WIDTH    600
-#define WINDOW_HEIGHT   600
+#define WINDOW_WIDTH    ( 1920 / 2 )
+#define WINDOW_HEIGHT   ( 1080 / 2 )
 #endif
 
 #define WINDOW_NAME     "Particles"
@@ -75,14 +75,12 @@ static void send_system_event
 static system_type system_instance;
 
 #if( PRINT_FRAMERATE )
-
-static GLdouble second_start_time;
-static uint32_t frames_since_second_start;
-
+    static GLdouble second_start_time;
+    static uint32_t frames_since_second_start;
 #endif
 
 /**********************************************************************
-                             FUNCIONS
+                             FUNCTIONS
 **********************************************************************/
 
 void register_system_listeners
@@ -136,8 +134,9 @@ boolean system_init
     system_instance.system_event_listeners    = vector_init( sizeof( system_event_callback ) );
     system_instance.frame_event_listeners     = vector_init( sizeof( frame_event_callback ) );
 
-    object_group_init();
     openGL_system_init();
+    object_group_init();
+    
 
 #if( PRINT_FRAMERATE )
     second_start_time = glfwGetTime();
@@ -253,7 +252,14 @@ static void frame
     /* Send the frame events out */
     memset( &event_data, 0, sizeof( frame_event_type ) );
     event_data.timestamp = glfwGetTime();
-    event_data.timesince_last_frame = event_data.timestamp - last_timestamp;
+    if( 0.0 == last_timestamp )
+    {
+        event_data.timesince_last_frame = 0.0;
+    }
+    else
+    {    
+        event_data.timesince_last_frame = event_data.timestamp - last_timestamp;
+    }
     last_timestamp = event_data.timestamp;
 
 #if( PRINT_FRAMERATE )
