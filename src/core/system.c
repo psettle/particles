@@ -22,11 +22,11 @@
 #define FULLSCREEN      FALSE
 
 #if FULLSCREEN
-#define WINDOW_WIDTH    1920
-#define WINDOW_HEIGHT   1080
+    #define WINDOW_WIDTH    1920
+    #define WINDOW_HEIGHT   1080
 #else
-#define WINDOW_WIDTH    ( 1920 / 2 )
-#define WINDOW_HEIGHT   ( 1080 / 2 )
+    #define WINDOW_WIDTH    ( 1920 / 2 )
+    #define WINDOW_HEIGHT   ( 1080 / 2 )
 #endif
 
 #define WINDOW_NAME     "Particles"
@@ -137,7 +137,6 @@ boolean system_init
     openGL_system_init();
     object_group_init();
     
-
 #if( PRINT_FRAMERATE )
     second_start_time = glfwGetTime();
     frames_since_second_start = 0;
@@ -161,6 +160,14 @@ void system_run
         
         frame();
     }
+}
+
+GLFWwindow* system_get_window
+    (
+        void
+    )
+{
+    return system_instance.glfw_window;
 }
 
 static boolean openGL_system_init

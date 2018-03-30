@@ -1,4 +1,3 @@
-#pragma once
 /**
  * @file system.h
  *
@@ -53,6 +52,14 @@ boolean system_init
  * @brief Run the application to completion
  */
 void system_run
+    (
+        void
+    );
+
+/**
+ * @brief Grab the handle to the system window.
+ */
+GLFWwindow* system_get_window
     (
         void
     );

@@ -16,5 +16,5 @@ void main()
     gl_Position = MVP * vec4(position, 1.0f);
 
     normal_out = mat3( transpose( inverse( model_matrix ) ) ) * normal;  
-    pos_out = vec3( gl_Position );
+    pos_out = vec3( model_matrix * vec4(position, 1.0f) );
 }

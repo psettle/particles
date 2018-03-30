@@ -39,6 +39,7 @@ SOURCES += src/core/system.c
 SOURCES += src/core/object_group_core.c
 SOURCES += src/core/object.c
 SOURCES += src/core/camera.c
+SOURCES += src/core/moving_camera_util.c
 
 #lib includes
 LIBS += lib/libSOIL.a
